@@ -1,0 +1,12 @@
+MUST HAVE
+* Create single program from given terminal and function nodes
+* Create population by ramped half-and-half
+* Evaluate fitness of program
+* Track best-of-run
+* Create new generation from current generation
+
+NICE TO HAVE
+* Serialize program to S-expression and de-serialize
+* Optimize programs
+* Hooks for visualizers
+* Adapters for Hadoop/EMR

@@ -37,9 +37,10 @@ class FullGenerationStrategySpec extends Specification with Mockito {
       result must have length(3)
     }
 
-    "initialize all children of a branch node it generates with another FullGenerationStrategy and decremented depth" in {
+    "initialize all children of a branch node it generates with itself and with decremented depth" in {
       val result = testStrategy.generateChildren(5,17)
       result.forall((node: ProgramNode[Int]) => node.depth == 4) must beTrue
+      result.forall((node: ProgramNode[Int]) => node.childrenCreationStrategy == testStrategy) must beTrue
     }
 
     "generate all terminal nodes in a leaf node" in {

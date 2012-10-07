@@ -1,5 +1,4 @@
 MUST HAVE
-* Create single program from given terminal and function nodes
 * Create population by ramped half-and-half
 * Evaluate fitness of program
 * Track best-of-run

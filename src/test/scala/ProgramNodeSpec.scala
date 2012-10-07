@@ -25,8 +25,8 @@ object FakeProgramNode2 extends ProgramNode[Int](ConstantEvaluationFunction, new
 object AddProgramNode extends ProgramNode(AddEvaluationFunction, new FakeGenerationStrategy, 1) {
 }
 
-class FakeGenerationStrategy extends ProgramGenerationStrategy[Int] {
-  def generateChildren(depth: Int) = {
+class FakeGenerationStrategy extends ProgramGenerationStrategy[Int](List(), List()) {
+  def generateChildren(depth: Int, arity: Int) = {
     List(FakeProgramNode1, FakeProgramNode2)
   }
 }

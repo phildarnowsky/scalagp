@@ -8,7 +8,7 @@ case class ProgramNode[T](
   val depth:Int = 0
 ) {
 
-  lazy val children: Seq[ProgramNode[T]] = childrenCreationStrategy.generateChildren(depth)
+  lazy val children: Seq[ProgramNode[T]] = childrenCreationStrategy.generateChildren(depth, 0)
 
   def evaluate(): T = {
     evaluationFunction(children)

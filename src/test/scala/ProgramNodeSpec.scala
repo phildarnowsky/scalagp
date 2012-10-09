@@ -2,19 +2,21 @@ import org.specs2.mutable._
 
 import com.darnowsky.scalagp.ProgramNode._
 import com.darnowsky.scalagp.ProgramGenerationStrategy._
+import com.darnowsky.scalagp.NodeFunction.{TerminalNodeFunction, NonterminalNodeFunction}
+import org.specs2.mock._
 
-object ConstantEvaluationFunction extends Function1[Seq[ProgramNode[Int]], Int] {
+object ConstantEvaluationFunction extends TerminalNodeFunction[Int] {
   def apply(xs: Seq[ProgramNode[Int]]) = 42 
 }
 
-object AddEvaluationFunction extends Function1[Seq[ProgramNode[Int]], Int] {
+object AddEvaluationFunction extends NonterminalNodeFunction[Int](2) {
   def apply(nodes: Seq[ProgramNode[Int]]) = nodes.map(_.evaluate).sum
 }
 
 class FakeProgramNode(childrenCreationStrategy: ProgramGenerationStrategy[Int], depth: Int) extends ProgramNode[Int](ConstantEvaluationFunction, childrenCreationStrategy, depth) {
 }
 
-class TopProgramNode(childrenCreationStrategy: ProgramGenerationStrategy[Int], depth: Int = 0) extends ProgramNode[Int](ConstantEvaluationFunction, childrenCreationStrategy, depth)
+class TopProgramNode(childrenCreationStrategy: ProgramGenerationStrategy[Int], depth: Int = 5) extends ProgramNode[Int](ConstantEvaluationFunction, childrenCreationStrategy, depth)
 
 object FakeProgramNode1 extends ProgramNode[Int](ConstantEvaluationFunction, new FakeGenerationStrategy, 1) {
 }
@@ -22,7 +24,7 @@ object FakeProgramNode1 extends ProgramNode[Int](ConstantEvaluationFunction, new
 object FakeProgramNode2 extends ProgramNode[Int](ConstantEvaluationFunction, new FakeGenerationStrategy, 2) {
 }
 
-object AddProgramNode extends ProgramNode(AddEvaluationFunction, new FakeGenerationStrategy, 1) {
+object AddProgramNode extends ProgramNode(AddEvaluationFunction, new FakeGenerationStrategy, 3) {
 }
 
 class FakeGenerationStrategy extends ProgramGenerationStrategy[Int](List(), List()) {
@@ -31,7 +33,7 @@ class FakeGenerationStrategy extends ProgramGenerationStrategy[Int](List(), List
   }
 }
 
-class ProgramNodeSpec extends Specification {
+class ProgramNodeSpec extends Specification with Mockito {
   "A ProgramNode" should {
     "use the children assigned to it by the ProgramGenerationStrategy it's initialized with" in {
       val topNode = new TopProgramNode(new FakeGenerationStrategy)
@@ -47,6 +49,13 @@ class ProgramNodeSpec extends Specification {
 
     "be able to evaluate itself as a function of its children" in {
       AddProgramNode.evaluate() mustEqual (42 + 42)
+    }
+
+    "call generateChildren on its ProgramGenerationStrategy with the correct depth and arity" in {
+      val spiedStrategy = spy(new FakeGenerationStrategy)
+      val node = new ProgramNode(AddEvaluationFunction, spiedStrategy, 3)
+      val kids = node.children
+      there was one(spiedStrategy).generateChildren(3, 2)
     }
   }
 }

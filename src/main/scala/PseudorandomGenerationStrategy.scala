@@ -4,7 +4,10 @@ import com.darnowsky.scalagp.ProgramGenerationStrategy._
 import com.darnowsky.scalagp.NodeFunction.{NodeFunction, TerminalNodeFunction, NonterminalNodeFunction}
 import com.darnowsky.scalagp.ProgramNode.ProgramNode
 
-abstract class PseudorandomGenerationStrategy[T](nonterminals: Seq[NonterminalNodeFunction[T]], terminals: Seq[TerminalNodeFunction[T]]) extends ProgramGenerationStrategy[T](nonterminals, terminals) {
+abstract class PseudorandomGenerationStrategy[T](
+  nonterminals: Seq[NonterminalNodeFunction[T]], 
+  terminals: Seq[TerminalNodeFunction[T]]) 
+extends ProgramGenerationStrategy[T](nonterminals, terminals) {
   val rng = new scala.util.Random
 
   def functionsAllowedAtTerminalDepth(): Seq[NodeFunction[T]]

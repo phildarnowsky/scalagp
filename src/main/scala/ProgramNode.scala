@@ -3,7 +3,7 @@ package com.darnowsky.scalagp.ProgramNode
 import com.darnowsky.scalagp.ProgramGenerationStrategy.ProgramGenerationStrategy
 import com.darnowsky.scalagp.NodeFunction.NodeFunction
 
-case class ProgramNode[T](
+class ProgramNode[T](
   val evaluationFunction: NodeFunction[T],
   val childrenCreationStrategy: ProgramGenerationStrategy[T], 
   val depth:Int = 0

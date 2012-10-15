@@ -1,7 +1,7 @@
 package com.darnowsky.scalagp.GrowGenerationStrategy
 
 import com.darnowsky.scalagp.PsuedorandomGenerationStrategy._
-import com.darnowsky.scalagp.NodeFunction.{NodeFunction, TerminalNodeFunction, NonterminalNodeFunction}
+import com.darnowsky.scalagp.NodeFunction._
 
 class GrowGenerationStrategy[T](
   nonterminals: Seq[NonterminalNodeFunction[T]], 

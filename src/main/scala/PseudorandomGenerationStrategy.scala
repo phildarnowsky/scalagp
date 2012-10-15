@@ -1,7 +1,7 @@
 package com.darnowsky.scalagp.PsuedorandomGenerationStrategy
 
 import com.darnowsky.scalagp.ProgramGenerationStrategy._
-import com.darnowsky.scalagp.NodeFunction.{NodeFunction, TerminalNodeFunction, NonterminalNodeFunction}
+import com.darnowsky.scalagp.NodeFunction._
 import com.darnowsky.scalagp.ProgramNode.ProgramNode
 
 abstract class PseudorandomGenerationStrategy[T](

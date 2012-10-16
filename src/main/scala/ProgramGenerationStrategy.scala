@@ -7,6 +7,7 @@ abstract class ProgramGenerationStrategy[T](
   val nonterminals: Seq[NonterminalNodeFunction[T]], 
   val terminals: Seq[TerminalNodeFunction[T]]) {
   def generateChildren(depth: Int, arity: Int): Seq[ProgramNode[T]]
+  def generateProgram(depth: Int): ProgramNode[T] = generateChildren(depth, 1).head
 
   protected
 

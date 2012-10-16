@@ -1,5 +1,4 @@
 MUST HAVE
-* Create population by ramped half-and-half
 * Evaluate fitness of program
 * Track best-of-run
 * Create new generation from current generation

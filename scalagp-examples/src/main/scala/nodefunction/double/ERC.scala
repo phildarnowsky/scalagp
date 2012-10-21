@@ -16,6 +16,8 @@ class ERCNodeFunction(lower: Double, upper: Double) extends TerminalNodeFunction
   lazy val constantValue = (new scala.util.Random).nextDouble * spread + lower
 
   def apply(_children: Seq[ProgramNode[Double]]) = constantValue
+
+  def toIdentifier = constantValue.toString
 }
 
 class ERCNodeFunctionCreator(lower: Double, upper: Double) extends TerminalNodeFunctionCreator[Double] {

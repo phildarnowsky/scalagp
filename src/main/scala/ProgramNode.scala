@@ -14,4 +14,11 @@ class ProgramNode[T](
   def evaluate(): T = {
     evaluationFunction(children)
   }
+
+  def toSExpression(): String = {
+    if(children.isEmpty)
+      evaluationFunction.toIdentifier
+    else
+      "(" ++ evaluationFunction.toIdentifier ++ children.map(_.toSExpression).fold("")(_ ++ " " ++ _) ++ ")"
+  }
 }

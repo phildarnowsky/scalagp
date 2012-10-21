@@ -7,10 +7,12 @@ import org.specs2.mock._
 
 object ConstantEvaluationFunction extends TerminalNodeFunction[Int] {
   def apply(xs: Seq[ProgramNode[Int]]) = 42 
+  def toIdentifier = "42"
 }
 
 object AddEvaluationFunction extends NonterminalNodeFunction[Int](2) {
   def apply(nodes: Seq[ProgramNode[Int]]) = nodes.map(_.evaluate).sum
+  def toIdentifier = "+"
 }
 
 class FakeProgramNode(childrenCreationStrategy: ProgramGenerationStrategy[Int], depth: Int) extends ProgramNode[Int](ConstantEvaluationFunction, childrenCreationStrategy, depth) {

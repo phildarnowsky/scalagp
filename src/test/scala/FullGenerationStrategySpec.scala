@@ -4,10 +4,15 @@ import org.specs2.specification.Scope
 import com.darnowsky.scalagp.FullGenerationStrategy._
 import com.darnowsky.scalagp.ProgramNode._
 
-class FullGenerationStrategySpec extends Specification with SpecHelpers {
+class FullGenerationStrategySpec extends Specification with SpecHelpers with ProgramGenerationStrategySharedExamples {
   val testStrategy = new FullGenerationStrategy[Int](List(Nonterminal1, Nonterminal2), List(Terminal1, Terminal2))
 
+  val generatorTestStrategy = new FullGenerationStrategy[Int](List(NonterminalGenerator1), List(TerminalGenerator1))
+
   "A FullGenerationStrategy" should {
+    generateTerminals(generatorTestStrategy, Terminal1)
+    generateNonterminals(generatorTestStrategy, Nonterminal1)
+
     "generate all nonterminal nodes in a branch node" in {
       val result = testStrategy.generateChildren(2, 3)
       allEvaluationFunctionsIn(result, List(Nonterminal1, Nonterminal2)) must beTrue

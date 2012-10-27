@@ -8,12 +8,16 @@ abstract class NodeFunction[T] extends Function1[Seq[ProgramNode[T]], T] {
   def toIdentifier(): String
 }
 
-abstract class TerminalNodeFunction[T] extends NodeFunction[T] {
+abstract class TerminalNodeFunction[T] extends NodeFunction[T] with TerminalNodeFunctionCreator[T] {
   val arity = 0
+
+  def getNodeFunction = this
 }
 
-abstract class NonterminalNodeFunction[T](val arity: Int) extends NodeFunction[T] {
+abstract class NonterminalNodeFunction[T](val arity: Int) extends NodeFunction[T] with NonterminalNodeFunctionCreator[T] {
   require(arity > 0, "Arity must be positive")
+  
+  def getNodeFunction = this
 }
 
 trait NodeFunctionCreator[T] {
@@ -26,9 +30,4 @@ trait NonterminalNodeFunctionCreator[T] extends NodeFunctionCreator[T] {
 
 trait TerminalNodeFunctionCreator[T] extends NodeFunctionCreator[T] {
   def getNodeFunction(): TerminalNodeFunction[T]
-}
-
-object NodeFunctionCreator {
-  implicit def nonTerminalNodeFunctionCreator2NonTerminalNode[T](creator: NonterminalNodeFunctionCreator[T]): NonterminalNodeFunction[T] = creator.getNodeFunction()
-  implicit def terminalNodeFunctionCreator2TerminalNode[T](creator: TerminalNodeFunctionCreator[T]): TerminalNodeFunction[T] = creator.getNodeFunction()
 }

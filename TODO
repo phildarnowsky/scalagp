@@ -1,5 +1,5 @@
 MUST HAVE
-* Evaluate fitness of program
+* Be able to pass in, to program, a "world" or state
 * Track best-of-run
 * Create new generation from current generation
 

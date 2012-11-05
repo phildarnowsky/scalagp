@@ -1,7 +1,7 @@
 MUST HAVE
-* Be able to pass in, to program, a "world" or state
 * Track best-of-run
 * Create new generation from current generation
+* Termination conditions
 
 NICE TO HAVE
 * Serialize program to S-expression and de-serialize

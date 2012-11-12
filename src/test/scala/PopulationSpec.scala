@@ -2,7 +2,7 @@ import org.specs2.mutable._
 import org.specs2.mock._
 
 import com.darnowsky.scalagp.ProgramGenerationStrategy._
-import com.darnowsky.scalagp.NodeFunction.{TerminalNodeFunction, NonterminalNodeFunction}
+import com.darnowsky.scalagp.NodeFunction.{TerminalNodeFunction, NonterminalNodeFunction, NodeFunctionCreator}
 import com.darnowsky.scalagp.FullGenerationStrategy.FullGenerationStrategy
 import com.darnowsky.scalagp.GrowGenerationStrategy.GrowGenerationStrategy
 import com.darnowsky.scalagp.ProgramNode.ProgramNode
@@ -33,6 +33,16 @@ class PopulationSpec extends Specification with Mockito {
     def toIdentifier = "456"
   }
 
+  class TerminalProgramGenerationStrategy extends ProgramGenerationStrategy[Int](List(), List(Terminal1, Terminal2)) {
+    var terminalIndex = 0
+
+    def chooseNonterminalFunction(): NodeFunctionCreator[Int] = Terminal1 //should never be called
+    def chooseTerminalFunction(): NodeFunctionCreator[Int] = {
+      val result = terminals(terminalIndex)
+      terminalIndex += 1
+      result
+    }
+  }
 
   "The Population companion object" should {
     "be able to generate a Population via ramped even splits" in {
@@ -48,12 +58,8 @@ class PopulationSpec extends Specification with Mockito {
 
   "A Population" should {
     "evaluate its constituent programs for fitness" in {
-      object TerminalProgramGenerationStrategy extends ProgramGenerationStrategy[Int](List(), List()) {
-        def generateChildren(depth: Int, arity: Int): Seq[ProgramNode[Int]] = List(Terminal1, Terminal2).map(new ProgramNode[Int](_, this, depth - 1))
-      }
-
-      val testProgram1 = new ProgramNode(Nonterminal1, TerminalProgramGenerationStrategy, 2)
-      val testProgram2 = new ProgramNode(Nonterminal2, TerminalProgramGenerationStrategy, 2)
+      val testProgram1 = new ProgramNode(Nonterminal1, new TerminalProgramGenerationStrategy, 2, None)
+      val testProgram2 = new ProgramNode(Nonterminal2, new TerminalProgramGenerationStrategy, 2, None)
       val population = new Population(List(testProgram1, testProgram2), TestProgramFitnessFunction)
 
       val fitnessResult = population.fitnesses

@@ -10,18 +10,16 @@ abstract class PseudorandomGenerationStrategy[T](
 extends ProgramGenerationStrategy[T](nonterminals, terminals) {
   val rng = new scala.util.Random
 
+  def chooseTerminalFunction(): NodeFunctionCreator[T] = {
+    chooseArbitraryNodeFunction(functionsAllowedAtTerminalDepth)
+  }
+
+  def chooseNonterminalFunction(): NodeFunctionCreator[T] = {
+    chooseArbitraryNodeFunction(functionsAllowedAtNonterminalDepth)
+  }
+
   def functionsAllowedAtTerminalDepth(): Seq[NodeFunctionCreator[T]]
   def functionsAllowedAtNonterminalDepth(): Seq[NodeFunctionCreator[T]]
-
-  def generateChildren(depth: Int, arity: Int) = {
-    val functionsToChooseFrom = if(isTerminalDepth(depth)) 
-      functionsAllowedAtTerminalDepth
-    else 
-      functionsAllowedAtNonterminalDepth
-
-    val evaluationFunctions = Range(0, arity).map(_ => chooseArbitraryNodeFunction(functionsToChooseFrom))
-    evaluationFunctions.map(_.getNodeFunction()).map(new ProgramNode[T](_, this, depth - 1))
-  }
 
   protected
 

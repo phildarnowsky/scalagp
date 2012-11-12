@@ -2,8 +2,8 @@ import com.darnowsky.scalagp.ProgramNode.ProgramNode
 import com.darnowsky.scalagp.NodeFunction.{NodeFunction, TerminalNodeFunction, NonterminalNodeFunction, TerminalNodeFunctionCreator, NonterminalNodeFunctionCreator}
 
 trait SpecHelpers {
-  def allEvaluationFunctionsIn[T](nodes: Seq[ProgramNode[T]], functions: Seq[NodeFunction[T]]): Boolean = {
-    nodes.forall((node: ProgramNode[T]) => functions.contains(node.evaluationFunction))
+  def allEvaluationFunctionsIn[T](actual_functions: Seq[NodeFunction[T]], expected_functions: Seq[NodeFunction[T]]): Boolean = {
+    actual_functions.forall(expected_functions.contains(_))
   }
 
   object Nonterminal1 extends NonterminalNodeFunction[Int](2) {

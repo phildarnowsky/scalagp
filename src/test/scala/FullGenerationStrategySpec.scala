@@ -13,22 +13,16 @@ class FullGenerationStrategySpec extends Specification with SpecHelpers with Pro
     generateTerminals(generatorTestStrategy, Terminal1)
     generateNonterminals(generatorTestStrategy, Nonterminal1)
 
-    "generate all nonterminal nodes in a branch node" in {
-      val result = testStrategy.generateChildren(2, 3)
+    "generate all nonterminal node functions in a branch node" in {
+      val result = testStrategy.generateChildFunctions(false, 10)
       allEvaluationFunctionsIn(result, List(Nonterminal1, Nonterminal2)) must beTrue
-      result must have length(3)
+      result must have length(10)
     }
 
-    "initialize all children of a branch node it generates with itself and with decremented depth" in {
-      val result = testStrategy.generateChildren(5,17)
-      result.forall((node: ProgramNode[Int]) => node.depth == 4) must beTrue
-      result.forall((node: ProgramNode[Int]) => node.childrenCreationStrategy == testStrategy) must beTrue
-    }
-
-    "generate all terminal nodes in a leaf node" in {
-      val result = testStrategy.generateChildren(1, 3)
+    "generate all terminal node functions in a leaf node" in {
+      val result = testStrategy.generateChildFunctions(true, 17)
       allEvaluationFunctionsIn(result, List(Terminal1, Terminal2)) must beTrue
-      result must have length(3)
+      result must have length(17)
     }
   }
 }

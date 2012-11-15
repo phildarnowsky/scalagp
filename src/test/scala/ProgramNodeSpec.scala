@@ -23,13 +23,14 @@ object AddEvaluationFunction extends NonterminalNodeFunction[Int](2) {
 class FakeProgramNode(childrenCreationStrategy: ProgramGenerationStrategy[Int], depth: Int, parent: Option[ProgramNode[Int]]) extends ProgramNode[Int](ConstantEvaluationFunction1, childrenCreationStrategy, depth, parent) {
 }
 
-class TopProgramNode(childrenCreationStrategy: ProgramGenerationStrategy[Int], depth: Int = 5) extends ProgramNode[Int](AddEvaluationFunction, childrenCreationStrategy, depth, None)
+class TopProgramNode(childrenCreationStrategy: ProgramGenerationStrategy[Int], depth: Int = 2) extends ProgramNode[Int](AddEvaluationFunction, childrenCreationStrategy, depth, None)
 
 class FakeGenerationStrategy extends ProgramGenerationStrategy[Int](List(), List()) {
-  var callCount = 0
-
   override def generateChildFunctions(terminalDepth: Boolean, arity: Int) = {
-    List(ConstantEvaluationFunction1, ConstantEvaluationFunction2)
+    if(terminalDepth)
+      List(ConstantEvaluationFunction1, ConstantEvaluationFunction2)
+    else
+      List(AddEvaluationFunction, AddEvaluationFunction)
   }
 
   def chooseTerminalFunction() = ConstantEvaluationFunction1
@@ -55,6 +56,15 @@ class ProgramNodeSpec extends Specification with Mockito {
       val topNode = new TopProgramNode(new FakeGenerationStrategy)
       topNode.children(0).indexWithinParent mustEqual 0
       topNode.children(1).indexWithinParent mustEqual 1
+    }
+
+    "be able to find a path to the root" in {
+      val topNode = new TopProgramNode(new FakeGenerationStrategy, 5)
+      topNode.pathToRoot() mustEqual List()
+      topNode.children(1).pathToRoot() mustEqual List(1)
+      topNode.children(1).children(1).pathToRoot() mustEqual List(1,1)
+      topNode.children(1).children(1).children(0).pathToRoot() mustEqual List(0, 1,1)
+      topNode.children(1).children(1).children(0).children(1).pathToRoot() mustEqual List(1, 0, 1,1)
     }
 
     "be able to evaluate itself" in {

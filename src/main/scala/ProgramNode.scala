@@ -13,7 +13,14 @@ class ProgramNode[T](
 
   lazy val children: IndexedSeq[ProgramNode[T]] = {
     val childFunctions = childrenCreationStrategy.generateChildFunctions(nextLevelTerminal, evaluationFunction.arity)
-    childFunctions.toIndexedSeq.zipWithIndex.map{(functionTuple) => new ProgramNode[T](functionTuple._1, childrenCreationStrategy, depth - 1, Some(this), functionTuple._2)}
+    childFunctions.toIndexedSeq.zipWithIndex.map{
+      (functionTuple) => new ProgramNode[T](
+        functionTuple._1, 
+        childrenCreationStrategy, 
+        depth - 1, 
+        Some(this), 
+        functionTuple._2)
+    }
   }
 
   val nextLevelTerminal = (this.depth - 1 == 1)
@@ -29,15 +36,10 @@ class ProgramNode[T](
       "(" ++ evaluationFunction.toIdentifier ++ children.map(_.toSExpression).fold("")(_ ++ " " ++ _) ++ ")"
   }
 
-/*  def chooseRandomNode(): ProgramNodePath = {*/
-    //val pathList = chooseRandomNodeRecursive(1, List())._2
-    //new ProgramNodePath(pathList)
-  //}
-
-  //def chooseRandomNodeRecursive(chancesOutOf: Int, pathList: List[Int]): (Int, List[Int]) = {
-    //(chancesOutOf, pathList)
-  /*}*/
+  def pathToRoot(soFar: List[Int] = List()): List[Int] = {
+    parent match {
+      case None => soFar.reverse
+      case Some(parentNode) => parentNode.pathToRoot(indexWithinParent :: soFar)
+    }
+  }
 }
-
-//class ProgramNodePath(val coordinates: List[Int]) {
-//}

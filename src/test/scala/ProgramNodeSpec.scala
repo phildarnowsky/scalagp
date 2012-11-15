@@ -46,9 +46,16 @@ class ProgramNodeSpec extends Specification with Mockito {
       topNode.children(1).evaluationFunction mustEqual ConstantEvaluationFunction2
     }
 
-    "know who its parent is" in { pending }
+    "know who its parent is" in { 
+      val topNode = new TopProgramNode(new FakeGenerationStrategy)
+      topNode.children.forall(_.parent == Some(topNode)) mustEqual true
+    }
 
-    "know its index within its parent" in { pending }
+    "know its index within its parent" in { 
+      val topNode = new TopProgramNode(new FakeGenerationStrategy)
+      topNode.children(0).indexWithinParent mustEqual 0
+      topNode.children(1).indexWithinParent mustEqual 1
+    }
 
     "be able to evaluate itself" in {
       val constantNode = new ProgramNode[Int](ConstantEvaluationFunction1, new FakeGenerationStrategy, 1, None)

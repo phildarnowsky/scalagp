@@ -7,12 +7,13 @@ class ProgramNode[T](
   val evaluationFunction: NodeFunction[T],
   val childrenCreationStrategy: ProgramGenerationStrategy[T], 
   val depth:Int = 0,
-  val parent: Option[ProgramNode[T]]
+  val parent: Option[ProgramNode[T]],
+  val indexWithinParent: Int = 0
 ) {
 
   lazy val children: IndexedSeq[ProgramNode[T]] = {
     val childFunctions = childrenCreationStrategy.generateChildFunctions(nextLevelTerminal, evaluationFunction.arity)
-    childFunctions.map(new ProgramNode[T](_, childrenCreationStrategy, depth - 1, Some(this))).toIndexedSeq
+    childFunctions.toIndexedSeq.zipWithIndex.map{(functionTuple) => new ProgramNode[T](functionTuple._1, childrenCreationStrategy, depth - 1, Some(this), functionTuple._2)}
   }
 
   val nextLevelTerminal = (this.depth - 1 == 1)

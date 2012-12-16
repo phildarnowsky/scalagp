@@ -1,5 +1,6 @@
 import com.darnowsky.scalagp.ProgramNode.ProgramNode
-import com.darnowsky.scalagp.NodeFunction.{NodeFunction, TerminalNodeFunction, NonterminalNodeFunction, TerminalNodeFunctionCreator, NonterminalNodeFunctionCreator}
+import com.darnowsky.scalagp.NodeFunction._
+import com.darnowsky.scalagp.ProgramGenerationStrategy.ProgramGenerationStrategy
 
 trait SpecHelpers {
   def allEvaluationFunctionsIn[T](actual_functions: Seq[NodeFunction[T]], expected_functions: Seq[NodeFunction[T]]): Boolean = {
@@ -32,5 +33,20 @@ trait SpecHelpers {
 
   object NonterminalGenerator1 extends NonterminalNodeFunctionCreator[Int] {
     def getNodeFunction = Nonterminal1
+  }
+
+  object ConstantEvaluationFunction1 extends TerminalNodeFunction[Int] {
+    def apply(xs: Seq[ProgramNode[Int]]) = 42 
+    def toIdentifier = "42"
+  }
+
+  object ConstantEvaluationFunction2 extends TerminalNodeFunction[Int] {
+    def apply(xs: Seq[ProgramNode[Int]]) = 666
+    def toIdentifier = "666"
+  }
+
+  object AddEvaluationFunction extends NonterminalNodeFunction[Int](2) {
+    def apply(nodes: Seq[ProgramNode[Int]]) = nodes.map(_.evaluate).sum
+    def toIdentifier = "+"
   }
 }

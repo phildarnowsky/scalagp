@@ -14,7 +14,7 @@ trait ProgramGenerationStrategySharedExamples extends Specification {
 
     "like any subclass of ProgramGenerationStrategy" should {
       "be able to generate terminal functions from an arbitrary object that implements TerminalNodeFunctionCreator" in { 
-        testStrategy.generateChildFunctions(true, 1).head mustEqual expectedTerminal
+        testStrategy.generateChildFunctions(1).head mustEqual expectedTerminal
       }
     }
   }
@@ -26,7 +26,7 @@ trait ProgramGenerationStrategySharedExamples extends Specification {
 
     "like any subclass of ProgramGenerationStrategy" should {
       "be able to generate nonterminal functions from an arbitrary object that implements NonterminalNodeFunctionCreator" in { 
-        testStrategy.generateChildFunctions(false, 1).head mustEqual expectedNonterminal
+        testStrategy.generateChildFunctions(1).head mustEqual expectedNonterminal
       }
     }
   }

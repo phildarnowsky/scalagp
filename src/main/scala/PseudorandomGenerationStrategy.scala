@@ -6,8 +6,9 @@ import com.darnowsky.scalagp.ProgramNode.ProgramNode
 
 abstract class PseudorandomGenerationStrategy[T](
   nonterminals: Seq[NonterminalNodeFunctionCreator[T]], 
-  terminals: Seq[TerminalNodeFunctionCreator[T]]) 
-extends ProgramGenerationStrategy[T](nonterminals, terminals) {
+  terminals: Seq[TerminalNodeFunctionCreator[T]],
+  depth: Int) 
+extends ProgramGenerationStrategy[T](nonterminals, terminals, depth) {
   val rng = new scala.util.Random
 
   def chooseTerminalFunction(): NodeFunctionCreator[T] = {

@@ -9,34 +9,33 @@ import com.darnowsky.scalagp.NodeFunction.{NonterminalNodeFunctionCreator, Termi
 object Population {
   def generate[ProgramType, FitnessType](
     trancheSize: Int, 
-    maximumDepth: Int, 
     generationStrategies: Seq[ProgramGenerationStrategy[ProgramType]],
     evaluationFunction: ProgramFitnessFunction[ProgramType, FitnessType]
   ): Population[ProgramType, FitnessType] = {
 
-    val programs = (1 to maximumDepth).flatMap(depth => 
-      generationStrategies.flatMap(strategy =>
-        (1 to trancheSize).map(_ => strategy.generateProgram(depth))))
+    val programs = generationStrategies.flatMap(strategy =>
+      (1 to trancheSize).map(_ => strategy.generateProgram))
 
     new Population(programs, evaluationFunction)
   }
 
-  //// Convenience method to generate population by the popular ramped half-and-
-  //// half method.
-  //def generateRampedHalfAndHalf[ProgramType, FitnessType] (
-    //trancheSize: Int,
-    //maximumDepth: Int,
-    //nonterminals: Seq[NonterminalNodeFunctionCreator[ProgramType]],
-    //terminals: Seq[TerminalNodeFunctionCreator[ProgramType]],
-    //evaluationFunction: ProgramFitnessFunction[ProgramType, FitnessType]
-  //) = {
-    //val strategies = List(
-      //new FullGenerationStrategy(nonterminals, terminals),
-      //new GrowGenerationStrategy(nonterminals, terminals)
-    //)
+  // Convenience method to generate population by the popular ramped half-and-
+  // half method.
+  def generateRampedHalfAndHalf[ProgramType, FitnessType] (
+    trancheSize: Int,
+    maximumDepth: Int,
+    nonterminals: Seq[NonterminalNodeFunctionCreator[ProgramType]],
+    terminals: Seq[TerminalNodeFunctionCreator[ProgramType]],
+    evaluationFunction: ProgramFitnessFunction[ProgramType, FitnessType]
+  ) = {
 
-    //generate(trancheSize, maximumDepth, strategies, evaluationFunction)
-  //}
+    val strategies = (1 to maximumDepth).flatMap((depth: Int) => List(
+      new FullGenerationStrategy(nonterminals, terminals, depth),
+      new GrowGenerationStrategy(nonterminals, terminals, depth)
+    ))
+
+    generate(trancheSize, strategies, evaluationFunction)
+  }
 }
 
 case class Population[ProgramType, FitnessType](

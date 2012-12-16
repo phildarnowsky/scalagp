@@ -5,8 +5,11 @@ import com.darnowsky.scalagp.NodeFunction._
 
 class FullGenerationStrategy[T](
   nonterminals: Seq[NonterminalNodeFunctionCreator[T]], 
-  terminals: Seq[TerminalNodeFunctionCreator[T]]) 
-extends PseudorandomGenerationStrategy[T](nonterminals, terminals) {
+  terminals: Seq[TerminalNodeFunctionCreator[T]],
+  depth: Int) 
+extends PseudorandomGenerationStrategy[T](nonterminals, terminals, depth) {
   val functionsAllowedAtTerminalDepth = terminals
   val functionsAllowedAtNonterminalDepth = nonterminals
+
+  def successor(): FullGenerationStrategy[T] = new FullGenerationStrategy(nonterminals, terminals, depth - 1)
 }

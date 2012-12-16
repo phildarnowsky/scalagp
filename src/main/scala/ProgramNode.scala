@@ -2,28 +2,21 @@ package com.darnowsky.scalagp.ProgramNode
 
 import com.darnowsky.scalagp.ProgramGenerationStrategy.ProgramGenerationStrategy
 import com.darnowsky.scalagp.NodeFunction.NodeFunction
+import scala.collection.immutable.Queue
 
-class ProgramNode[T](
+case class ProgramNode[T](
   val evaluationFunction: NodeFunction[T],
-  val childrenCreationStrategy: ProgramGenerationStrategy[T], 
-  val depth:Int = 0,
-  val parent: Option[ProgramNode[T]],
-  val indexWithinParent: Int = 0
+  val children: IndexedSeq[ProgramNode[T]],
+  val pathFromRoot:Queue[Int] = Queue()
 ) {
 
-  lazy val children: IndexedSeq[ProgramNode[T]] = {
-    val childFunctions = childrenCreationStrategy.generateChildFunctions(nextLevelTerminal, evaluationFunction.arity)
-    childFunctions.toIndexedSeq.zipWithIndex.map{
-      (functionTuple) => new ProgramNode[T](
-        functionTuple._1, 
-        childrenCreationStrategy, 
-        depth - 1, 
-        Some(this), 
-        functionTuple._2)
-    }
+ def this(
+    evaluationFunction: NodeFunction[T],
+    childrenCreationStrategy: ProgramGenerationStrategy[T], 
+    pathFromRoot:Queue[Int]
+  ) = {
+    this(evaluationFunction, childrenCreationStrategy.generateChildren(evaluationFunction.arity, pathFromRoot), pathFromRoot)
   }
-
-  val nextLevelTerminal = (this.depth - 1 == 1)
 
   def evaluate(): T = {
     evaluationFunction(children)
@@ -34,12 +27,5 @@ class ProgramNode[T](
       evaluationFunction.toIdentifier
     else
       "(" ++ evaluationFunction.toIdentifier ++ children.map(_.toSExpression).fold("")(_ ++ " " ++ _) ++ ")"
-  }
-
-  def pathToRoot(soFar: List[Int] = List()): List[Int] = {
-    parent match {
-      case None => soFar.reverse
-      case Some(parentNode) => parentNode.pathToRoot(indexWithinParent :: soFar)
-    }
   }
 }

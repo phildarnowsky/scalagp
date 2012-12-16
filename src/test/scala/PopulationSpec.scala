@@ -7,6 +7,7 @@ import com.darnowsky.scalagp.FullGenerationStrategy.FullGenerationStrategy
 import com.darnowsky.scalagp.GrowGenerationStrategy.GrowGenerationStrategy
 import com.darnowsky.scalagp.ProgramNode.ProgramNode
 import com.darnowsky.scalagp.Population._
+import scala.collection.immutable.Queue
 
 class PopulationSpec extends Specification with Mockito {
   object TestProgramFitnessFunction extends ProgramFitnessFunction[Int, Double] {
@@ -33,33 +34,27 @@ class PopulationSpec extends Specification with Mockito {
     def toIdentifier = "456"
   }
 
-  class TerminalProgramGenerationStrategy extends ProgramGenerationStrategy[Int](List(), List(Terminal1, Terminal2)) {
-    var terminalIndex = 0
-
-    def chooseNonterminalFunction(): NodeFunctionCreator[Int] = Terminal1 //should never be called
-    def chooseTerminalFunction(): NodeFunctionCreator[Int] = {
-      val result = terminals(terminalIndex)
-      terminalIndex += 1
-      result
-    }
-  }
-
   "The Population companion object" should {
-    "be able to generate a Population via ramped even splits" in {
-      val fullStrategy = spy(new FullGenerationStrategy[Int](List(Nonterminal1, Nonterminal2), List(Terminal1, Terminal2)))
-      val growStrategy = spy(new GrowGenerationStrategy[Int](List(Nonterminal1, Nonterminal2), List(Terminal1, Terminal2)))
+    "be able to generate a Population via even splits" in {
+      val fullStrategy = spy(new FullGenerationStrategy[Int](List(Nonterminal1, Nonterminal2), List(Terminal1, Terminal2), 5))
+      val growStrategy = spy(new GrowGenerationStrategy[Int](List(Nonterminal1, Nonterminal2), List(Terminal1, Terminal2), 5))
 
-      val population = Population.generate(3, 5, List(fullStrategy, growStrategy), TestProgramFitnessFunction)
+      val population = Population.generate(3, List(fullStrategy, growStrategy), TestProgramFitnessFunction)
 
-      (1 to 5).foreach(expectedDepth => there was 3.times(fullStrategy).generateProgram(expectedDepth))
-      (1 to 5).foreach(expectedDepth => there was 3.times(growStrategy).generateProgram(expectedDepth))
+      there was 3.times(fullStrategy).generateProgram
+      there was 3.times(growStrategy).generateProgram
     }
   }
 
   "A Population" should {
     "evaluate its constituent programs for fitness" in {
-      val testProgram1 = new ProgramNode(Nonterminal1, new TerminalProgramGenerationStrategy, 2, None)
-      val testProgram2 = new ProgramNode(Nonterminal2, new TerminalProgramGenerationStrategy, 2, None)
+      val commonChildren = Array(
+        new ProgramNode(Terminal1, Array():Array[ProgramNode[Int]], Queue(0)),
+        new ProgramNode(Terminal2, Array():Array[ProgramNode[Int]], Queue(1))
+      )
+
+      val testProgram1 = new ProgramNode(Nonterminal1, commonChildren, Queue())
+      val testProgram2 = new ProgramNode(Nonterminal2, commonChildren, Queue())
       val population = new Population(List(testProgram1, testProgram2), TestProgramFitnessFunction)
 
       val fitnessResult = population.fitnesses

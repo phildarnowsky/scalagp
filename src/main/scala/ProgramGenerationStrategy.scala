@@ -2,17 +2,30 @@ package com.darnowsky.scalagp.ProgramGenerationStrategy
 
 import com.darnowsky.scalagp.ProgramNode.ProgramNode
 import com.darnowsky.scalagp.NodeFunction._
+import scala.collection.immutable.Queue
 
-abstract class ProgramGenerationStrategy[T] (
+abstract case class ProgramGenerationStrategy[T] (
   val nonterminals: Seq[NonterminalNodeFunctionCreator[T]], 
-  val terminals: Seq[TerminalNodeFunctionCreator[T]]
+  val terminals: Seq[TerminalNodeFunctionCreator[T]],
+  val depth: Int
 ) {
 
-  def generateChildFunctions(nextLevelTerminal: Boolean, arity: Int): Seq[NodeFunction[T]] = {
+  def generateChildFunctions(arity: Int): Seq[NodeFunction[T]] = {
     (1 to arity).map(_ => if(nextLevelTerminal) chooseTerminalFunction.getNodeFunction else chooseNonterminalFunction.getNodeFunction)
   }
 
-  def generateProgram(depth: Int): ProgramNode[T] = {
+  def generateChildren(arity: Int, pathFromRoot: Queue[Int]): IndexedSeq[ProgramNode[T]] = {
+    val childFunctions = this.generateChildFunctions(arity)
+
+    childFunctions.toIndexedSeq.zipWithIndex.map{
+      (functionTuple) => new ProgramNode[T](
+        functionTuple._1, 
+        this.successor, 
+        pathFromRoot.enqueue(functionTuple._2))
+    }
+  }
+
+  def generateProgram(): ProgramNode[T] = {
     val evaluationFunction = if(depth == 1)
       chooseTerminalFunction.getNodeFunction
     else
@@ -21,14 +34,23 @@ abstract class ProgramGenerationStrategy[T] (
     new ProgramNode[T](
       evaluationFunction,
       this,
-      depth,
-      None
+      Queue()
     )
   }
-    //generateChildren(depth, 1, None).head
+
+  // The strategy that the children of a node that uses this strategy should
+  // be initialized with.
+  //
+  // Note that for some reason, doubtless the best of such, you can't just
+  // make this abstract base class also a case class and use copy here to
+  // automatically get a copy of the strategy in question, but with 
+  // depth = depth - 1. I sort of hate that.
+  def successor(): ProgramGenerationStrategy[T]
 
   protected
 
   def chooseTerminalFunction(): NodeFunctionCreator[T]
   def chooseNonterminalFunction(): NodeFunctionCreator[T]
+
+  def nextLevelTerminal(): Boolean = (depth - 1 == 1)
 }

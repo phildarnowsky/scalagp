@@ -7,46 +7,67 @@ trait SpecHelpers {
     actual_functions.forall(expected_functions.contains(_))
   }
 
-  object Nonterminal1 extends NonterminalNodeFunction[Int](2) {
-    def apply(children: Seq[ProgramNode[Int]]) = children.head.evaluate()
-    def toIdentifier = "nonterminal1"
+  object TerminalGenerator42 extends TerminalNodeFunctionCreator[Int] {
+    def getNodeFunction = ConstantEvaluationFunction42
   }
 
-  object Nonterminal2 extends NonterminalNodeFunction[Int](2) {
-    def apply(children: Seq[ProgramNode[Int]]) = children.last.evaluate()
-    def toIdentifier = "nonterminal2"
+  object NonterminalGeneratorHead extends NonterminalNodeFunctionCreator[Int] {
+    def getNodeFunction = HeadEvaluationFunction
   }
 
-  object Terminal1 extends TerminalNodeFunction[Int] {
-    def apply(children: Seq[ProgramNode[Int]]) = 42
-    def toIdentifier = "terminal1"
-  }
-
-  object Terminal2 extends TerminalNodeFunction[Int] {
-    def apply(children: Seq[ProgramNode[Int]]) = 666
-    def toIdentifier = "terminal2"
-  }
-
-  object TerminalGenerator1 extends TerminalNodeFunctionCreator[Int] {
-    def getNodeFunction = Terminal1
-  }
-
-  object NonterminalGenerator1 extends NonterminalNodeFunctionCreator[Int] {
-    def getNodeFunction = Nonterminal1
-  }
-
-  object ConstantEvaluationFunction1 extends TerminalNodeFunction[Int] {
+  object ConstantEvaluationFunction42 extends TerminalNodeFunction[Int] {
     def apply(xs: Seq[ProgramNode[Int]]) = 42 
     def toIdentifier = "42"
   }
 
-  object ConstantEvaluationFunction2 extends TerminalNodeFunction[Int] {
+  object ConstantEvaluationFunction666 extends TerminalNodeFunction[Int] {
     def apply(xs: Seq[ProgramNode[Int]]) = 666
     def toIdentifier = "666"
   }
 
+  object ConstantEvaluationFunction1337 extends TerminalNodeFunction[Int] {
+    def apply(xs: Seq[ProgramNode[Int]]) = 1337
+    def toIdentifier = "1337"
+  }
+
+  object ConstantEvaluationFunction3456 extends TerminalNodeFunction[Int] {
+    def apply(xs: Seq[ProgramNode[Int]]) = 3456
+    def toIdentifier = "3456"
+  }
+
+  object ConstantEvaluationFunction78910 extends TerminalNodeFunction[Int] {
+    def apply(xs: Seq[ProgramNode[Int]]) = 78910
+    def toIdentifier = "78910"
+  }
+
+  object HeadEvaluationFunction extends NonterminalNodeFunction[Int](2) {
+    def apply(children: Seq[ProgramNode[Int]]) = children.head.evaluate()
+    def toIdentifier = "head"
+  }
+
+  object LastEvaluationFunction extends NonterminalNodeFunction[Int](2) {
+    def apply(children: Seq[ProgramNode[Int]]) = children.last.evaluate()
+    def toIdentifier = "last"
+  }
+
+
   object AddEvaluationFunction extends NonterminalNodeFunction[Int](2) {
     def apply(nodes: Seq[ProgramNode[Int]]) = nodes.map(_.evaluate).sum
     def toIdentifier = "+"
+  }
+
+  object MultiplyEvaluationFunction extends NonterminalNodeFunction[Int](2) {
+    def apply(nodes: Seq[ProgramNode[Int]]) = nodes.map(_.evaluate).product
+    def toIdentifier = "*"
+  }
+
+  object SuccessorEvaluationFunction extends NonterminalNodeFunction[Int](1) {
+    def apply(nodes: Seq[ProgramNode[Int]]) = nodes.head.evaluate() + 1
+    def toIdentifier = "succ"
+  }
+
+  object NegateEvaluationFunction extends NonterminalNodeFunction[Int](1) {
+    def apply(nodes: Seq[ProgramNode[Int]]) = -(nodes.head.evaluate())
+    def toIdentifier = "-"
   }
 }

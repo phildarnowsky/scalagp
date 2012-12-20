@@ -22,10 +22,14 @@ case class ProgramNode[T](
     evaluationFunction(children)
   }
 
+  def crossoverWith(that: ProgramNode[T]): (ProgramNode[T], ProgramNode[T]) = (this, that)
+
   def toSExpression(): String = {
     if(children.isEmpty)
       evaluationFunction.toIdentifier
     else
       "(" ++ evaluationFunction.toIdentifier ++ children.map(_.toSExpression).fold("")(_ ++ " " ++ _) ++ ")"
   }
+
+  lazy val allDescendants: IndexedSeq[ProgramNode[T]] = children.flatMap(_.allDescendants) :+ this
 }

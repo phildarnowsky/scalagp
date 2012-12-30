@@ -4,7 +4,7 @@ import com.darnowsky.scalagp_examples.nodefunction.double.Operators._
 import com.darnowsky.scalagp_examples.nodefunction.double.ERC._
 import com.darnowsky.scalagp.Population._
 
-object RootFinderFitnessFunction extends ProgramFitnessFunction[Double, Double] {
+object RootFinderFitnessFunction extends ProgramFitnessFunction[Double] {
   // Find root of X^4 - 2X^2 (roots are 0, +/- sqrt 2)
   // Fitness function is magnitude of X^4 - 2X^2, that is, the error if we
   // take X as a root.
@@ -12,7 +12,7 @@ object RootFinderFitnessFunction extends ProgramFitnessFunction[Double, Double] 
 }
 
 object FindRootPopulation {
-  def create(trancheSize: Int, maximumDepth: Int): Population[Double, Double] = {
+  def create(trancheSize: Int, maximumDepth: Int): Population[Double] = {
     Population.generateRampedHalfAndHalf(
       trancheSize, 
       maximumDepth,

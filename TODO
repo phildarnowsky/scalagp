@@ -1,10 +1,14 @@
 MUST HAVE
-* Create new generation from current generation
+* Create new generation from current generation via fitness-proportionate selection
 * Track best-of-run
 * Termination conditions
 
 NICE TO HAVE
-* Serialize program to S-expression and de-serialize
+* Overselection
+* Tournament selection
+* Rank selection
+* Mutation
+* De-serialize programs from S-expressions
 * Optimize programs
 * Hooks for visualizers
 * Adapters for Hadoop/EMR

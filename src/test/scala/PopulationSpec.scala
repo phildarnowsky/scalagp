@@ -10,7 +10,7 @@ import com.darnowsky.scalagp.Population._
 import scala.collection.immutable.Queue
 
 class PopulationSpec extends Specification with SpecHelpers with Mockito {
-  object TestProgramFitnessFunction extends ProgramFitnessFunction[Int, Double] {
+  object TestProgramFitnessFunction extends ProgramFitnessFunction[Int] {
     def apply(programOutput: Int): Double = programOutput * 3.0
   }
 
@@ -41,6 +41,10 @@ class PopulationSpec extends Specification with SpecHelpers with Mockito {
       fitnessResult.size mustEqual 2
       fitnessResult(testProgram1) mustEqual 126.0
       fitnessResult(testProgram2) mustEqual 1998.0
+    }
+
+    "pick a program for reproduction proportionate to its fitness" in {
+      pending
     }
   }
 }

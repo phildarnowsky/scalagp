@@ -3,7 +3,7 @@ package com.darnowsky.scalagp_examples.population.SymbolicRegression
 import com.darnowsky.scalagp_examples.nodefunction.Polynomial._
 import com.darnowsky.scalagp.Population._
 
-class SymbolicRegressionFitnessFunction(val datapoints:Seq[(Double, Double)]) extends ProgramFitnessFunction[Polynomial, Double] {
+class SymbolicRegressionFitnessFunction(val datapoints:Seq[(Double, Double)]) extends ProgramFitnessFunction[Polynomial] {
   def apply(polynomial: Polynomial) = {
     val errors = datapoints.map((datapoint) => {
       val x = datapoint._1
@@ -29,7 +29,7 @@ object PolynomialPopulation {
   def create(
     trancheSize: Int, 
     maximumDepth: Int, 
-    fitnessFunction: SymbolicRegressionFitnessFunction): Population[Polynomial, Double] = {
+    fitnessFunction: SymbolicRegressionFitnessFunction): Population[Polynomial] = {
     Population.generateRampedHalfAndHalf(
       trancheSize,
       maximumDepth,

@@ -6,7 +6,7 @@ import scala.collection.immutable.Queue
 
 case class ProgramNode[T](
   val evaluationFunction: NodeFunction[T],
-  val children: IndexedSeq[ProgramNode[T]],
+  val children: IndexedSeq[ProgramNode[T]] = Vector[ProgramNode[T]](),
   val pathFromRoot:Queue[Int] = Queue()
 ) {
 

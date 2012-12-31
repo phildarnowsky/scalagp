@@ -74,5 +74,36 @@ class PopulationSpec extends Specification with SpecHelpers with Mockito {
       population.chooseProgramForReproduction mustEqual program3
       population.chooseProgramForReproduction mustEqual program3
     }
+
+    "create a new generation by fitness-proportionate selection" in {
+      val program1 = spy(new ProgramNode(ConstantEvaluationFunction42))
+      val program2 = spy(new ProgramNode(ConstantEvaluationFunction1337))
+      val program3 = spy(new ProgramNode(ConstantEvaluationFunction3456))
+      val program4 = spy(new ProgramNode(ConstantEvaluationFunction78910))
+
+      val population = spy(new Population[Int](List(program1, program2, program3, program4), TestProgramFitnessFunction))
+
+      /* Rigging the choice of programs this way involves knowing more about
+         the workings of fitness-proportionate selection than I would like,
+         but I can't seem to properly stub chooseProgramForReproduction
+         itself, possibly because it's overloaded. */
+
+      val program1Index = 1.0 / (42 * 3.0)
+      val program2Index = 1.0 / (1337 * 3.0)
+      val program3Index = 1.0 / (3456 * 3.0)
+      val epsilon = 0.00000000001
+
+      population.chooseValueInAllFitnessesRange().returns(program1Index - epsilon).
+                                                  thenReturns(program1Index - epsilon).
+                                                  thenReturns(program1Index + program2Index + epsilon).
+                                                  thenReturns(program1Index - epsilon)
+      
+      program1.crossoverWith(program1).returns(List(program3, program1))
+      program3.crossoverWith(program1).returns(List(program2, program1))
+
+      val newGeneration = population.breedNewGeneration
+
+      newGeneration.programs mustEqual List(program3, program1, program2, program1)
+    }
   }
 }

@@ -22,13 +22,13 @@ case class ProgramNode[T](
     evaluationFunction(children)
   }
 
-  def crossoverWith(that: ProgramNode[T]): (ProgramNode[T], ProgramNode[T]) = {
+  def crossoverWith(that: ProgramNode[T]): Seq[ProgramNode[T]] = {
     val thisCrossoverPoint = this.chooseRandomDescendant()
     val thatCrossoverPoint = that.chooseRandomDescendant()
 
     val thisNewTree = this.insertReplacementSubtree(thatCrossoverPoint, thisCrossoverPoint.pathFromRoot)
     val thatNewTree = that.insertReplacementSubtree(thisCrossoverPoint, thatCrossoverPoint.pathFromRoot)
-    (thisNewTree, thatNewTree)
+    List(thisNewTree, thatNewTree)
   }
 
   def toSExpression(): String = {

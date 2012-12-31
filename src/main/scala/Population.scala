@@ -83,6 +83,13 @@ case class Population[ProgramType](
       chooseProgramForReproduction(index - firstProgramFitness, programsInDescendingFitness.tail)
   }
 
+  def breedNewGeneration: Population[ProgramType] = {
+    val breeders = List.fill(programs.length)(chooseProgramForReproduction())
+    val breedingPairs = breeders.grouped(2)
+
+    this.copy(programs = breedingPairs.flatMap((pair) => pair(0).crossoverWith(pair(1))).toList)
+  }
+
   def chooseValueInAllFitnessesRange(): Double = fitnesses.map(_._2).sum * rng.nextDouble()
 }
 

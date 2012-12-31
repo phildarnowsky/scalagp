@@ -89,7 +89,9 @@ class ProgramNodeSpec extends Specification with Mockito with SpecHelpers {
 
       spiedProgram1.chooseRandomDescendant().returns(spiedProgram1) // choose the root
       spiedProgram2.chooseRandomDescendant().returns(spiedProgram2.children(0).children(1)) // choose (+ 3456 78910)
-      val(child1, child2) = spiedProgram1 crossoverWith spiedProgram2
+      val children = spiedProgram1 crossoverWith spiedProgram2
+      val child1 = children(0)
+      val child2 = children(1)
 
       child1.evaluate() mustEqual (3456 + 78910)
       child2.evaluate() mustEqual -(1338 * (42 - 666))
@@ -117,7 +119,9 @@ class ProgramNodeSpec extends Specification with Mockito with SpecHelpers {
 
       spiedProgram1.chooseRandomDescendant().returns(spiedProgram1.children(0)) // choose the 42 node
       spiedProgram2.chooseRandomDescendant().returns(spiedProgram2.children(0).children(1)) // choose (+ 3456 78910)
-      val(child1, child2) = spiedProgram1 crossoverWith spiedProgram2
+      val children = spiedProgram1 crossoverWith spiedProgram2
+      val child1 = children(0)
+      val child2 = children(1)
 
       child1.evaluate() mustEqual (3456 + 78910 - 666)
       child2.evaluate() mustEqual -(1338 * 42)

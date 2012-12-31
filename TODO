@@ -1,7 +1,8 @@
 MUST HAVE
-* Create new generation from current generation via fitness-proportionate selection
-* Track best-of-run
 * Termination conditions
+
+CHORES
+* Write README with some semblance of dox
 
 NICE TO HAVE
 * Overselection

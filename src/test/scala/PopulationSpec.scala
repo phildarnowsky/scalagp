@@ -105,5 +105,32 @@ class PopulationSpec extends Specification with SpecHelpers with Mockito {
 
       newGeneration.programs mustEqual List(program3, program1, program2, program1)
     }
+
+    "remember the best-of-run from one generation to the next" in {
+      val bestProgram = spy(new ProgramNode(ConstantEvaluationFunction42))
+      val goodProgram = spy(new ProgramNode(ConstantEvaluationFunction1337))
+      val badProgram = spy(new ProgramNode(ConstantEvaluationFunction3456))
+      val worseProgram = spy(new ProgramNode(ConstantEvaluationFunction78910))
+
+      val population = spy(new Population[Int](List(goodProgram, badProgram), TestProgramFitnessFunction))
+
+      population.bestOfPreviousGenerations mustEqual None
+      population.bestOfRun mustEqual (goodProgram, 1337.0 * 3)
+
+      // same stupid trick as above to get goodProgram twice
+      population.chooseValueInAllFitnessesRange().returns(0.0).thenReturns(0.0)
+      goodProgram.crossoverWith(goodProgram).returns(List(badProgram, worseProgram))
+
+      val secondGeneration = spy(population.breedNewGeneration)
+      secondGeneration.bestOfPreviousGenerations mustEqual Some((goodProgram, 1337.0 * 3))
+      secondGeneration.bestOfRun mustEqual (goodProgram, 1337.0 * 3)
+
+      secondGeneration.chooseValueInAllFitnessesRange().returns(0.0).thenReturns(0.0)
+      badProgram.crossoverWith(badProgram).returns(List(badProgram, bestProgram))
+      
+      val thirdGeneration = secondGeneration.breedNewGeneration
+      thirdGeneration.bestOfPreviousGenerations mustEqual Some((goodProgram, 1337.0 * 3))
+      thirdGeneration.bestOfRun mustEqual (bestProgram, 42.0 * 3)
+    }
   }
 }

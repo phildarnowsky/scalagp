@@ -40,13 +40,22 @@ object Population {
 
 case class Population[ProgramType](
   val programs: Seq[ProgramNode[ProgramType]], 
-  val fitnessFunction: ProgramFitnessFunction[ProgramType]
+  val fitnessFunction: ProgramFitnessFunction[ProgramType],
+  val bestOfPreviousGenerations: Option[(ProgramNode[ProgramType], Double)] = None
 ) {
 
   lazy val fitnesses = {
     val emptyMap = new scala.collection.immutable.HashMap[ProgramNode[ProgramType], Double]
     programs.foldLeft(emptyMap)((map, program) => map + (program -> fitnessFunction(program.evaluate())))
   }
+
+  lazy val bestOfCurrentGeneration = fitnesses.toList.sortBy(_._2).head
+
+  // is there a more idiomatic way to write this?
+  lazy val bestOfRun = bestOfPreviousGenerations match {
+                         case None => bestOfCurrentGeneration
+                         case Some(oldBest) => List(oldBest, bestOfCurrentGeneration).sortBy(_._2).head
+                       }
 
   val rng = new scala.util.Random
 
@@ -77,7 +86,7 @@ case class Population[ProgramType](
   def chooseProgramForReproduction(index: Double, programsInDescendingFitness: List[(ProgramNode[ProgramType], Double)]): ProgramNode[ProgramType] = {
     val(firstProgram, firstProgramFitness) = programsInDescendingFitness.head
     
-    if(index <= firstProgramFitness)
+    if(index <= firstProgramFitness || programsInDescendingFitness.tail.isEmpty) // the second clause is a little hack to deal with imprecision of double arithmetic
       firstProgram
     else
       chooseProgramForReproduction(index - firstProgramFitness, programsInDescendingFitness.tail)
@@ -87,7 +96,10 @@ case class Population[ProgramType](
     val breeders = List.fill(programs.length)(chooseProgramForReproduction())
     val breedingPairs = breeders.grouped(2)
 
-    this.copy(programs = breedingPairs.flatMap((pair) => pair(0).crossoverWith(pair(1))).toList)
+    this.copy(
+      programs = breedingPairs.flatMap((pair) => pair(0).crossoverWith(pair(1))).toList,
+      bestOfPreviousGenerations = Some(this.bestOfRun)
+    )
   }
 
   def chooseValueInAllFitnessesRange(): Double = fitnesses.map(_._2).sum * rng.nextDouble()

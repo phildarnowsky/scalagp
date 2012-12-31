@@ -8,7 +8,7 @@ object RootFinderFitnessFunction extends ProgramFitnessFunction[Double] {
   // Find root of X^4 - 2X^2 (roots are 0, +/- sqrt 2)
   // Fitness function is magnitude of X^4 - 2X^2, that is, the error if we
   // take X as a root.
-  def apply(x: Double) = scala.math.pow(x, 4.0) - 2.0 * scala.math.pow(x, 2.0)
+  def apply(x: Double) = (scala.math.pow(x, 4.0) - 2.0 * scala.math.pow(x, 2.0)).abs
 }
 
 object FindRootPopulation {

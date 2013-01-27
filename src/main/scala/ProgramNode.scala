@@ -18,9 +18,7 @@ case class ProgramNode[T](
     this(evaluationFunction, childrenCreationStrategy.generateChildren(evaluationFunction.arity, pathFromRoot), pathFromRoot)
   }
 
-  def evaluate(): T = {
-    evaluationFunction(children)
-  }
+  lazy val evaluate: T = evaluationFunction(children)
 
   def crossoverWith(that: ProgramNode[T]): Seq[ProgramNode[T]] = {
     val thisCrossoverPoint = this.chooseRandomDescendant()

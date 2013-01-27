@@ -93,8 +93,8 @@ class ProgramNodeSpec extends Specification with Mockito with SpecHelpers {
       val child1 = children(0)
       val child2 = children(1)
 
-      child1.evaluate() mustEqual (3456 + 78910)
-      child2.evaluate() mustEqual -(1338 * (42 - 666))
+      child1.evaluate mustEqual (3456 + 78910)
+      child2.evaluate mustEqual -(1338 * (42 - 666))
 
       child1.toSExpression mustEqual "(+ 3456 78910)"
       child2.toSExpression mustEqual "(- (* (succ 1337) (+ 42 (- 666))))"
@@ -123,8 +123,8 @@ class ProgramNodeSpec extends Specification with Mockito with SpecHelpers {
       val child1 = children(0)
       val child2 = children(1)
 
-      child1.evaluate() mustEqual (3456 + 78910 - 666)
-      child2.evaluate() mustEqual -(1338 * 42)
+      child1.evaluate mustEqual (3456 + 78910 - 666)
+      child2.evaluate mustEqual -(1338 * 42)
 
       child1.toSExpression mustEqual "(+ (+ 3456 78910) (- 666))"
       child2.toSExpression mustEqual "(- (* (succ 1337) 42))"
@@ -145,14 +145,14 @@ class ProgramNodeSpec extends Specification with Mockito with SpecHelpers {
 
     "be able to evaluate itself" in {
       val constantNode = new ProgramNode[Int](ConstantEvaluationFunction42, Array():Array[ProgramNode[Int]])
-      constantNode.evaluate() mustEqual 42
+      constantNode.evaluate mustEqual 42
     }
 
     "be able to evaluate itself as a function of its children" in {
       val leftChild = new ProgramNode[Int](ConstantEvaluationFunction42, Array():Array[ProgramNode[Int]], Queue(0))
       val rightChild = new ProgramNode[Int](ConstantEvaluationFunction666, Array():Array[ProgramNode[Int]], Queue(1))
       val topNode = new ProgramNode[Int](AddEvaluationFunction, Array(leftChild, rightChild))
-      topNode.evaluate() mustEqual (42 + 666)
+      topNode.evaluate mustEqual (42 + 666)
     }
   }
 

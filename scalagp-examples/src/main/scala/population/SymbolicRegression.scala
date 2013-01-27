@@ -10,7 +10,7 @@ class SymbolicRegressionFitnessFunction(val datapoints:Seq[(Double, Double)]) ex
       val y = datapoint._2
       val calculatedY = polynomial(x)
       val difference = y - calculatedY
-      difference * difference
+      scala.math.abs(difference)
     })
 
     errors.sum
@@ -38,4 +38,8 @@ object PolynomialPopulation {
       fitnessFunction
     )
   }
+
+  //def runRandomRegression(): Population[Polynomial] = {
+    //val initialPopulation = 
+  //}
 }

@@ -74,7 +74,7 @@ case class Population[ProgramType](
 
   lazy val fitnesses = {
     val emptyMap = new scala.collection.immutable.HashMap[ProgramNode[ProgramType], Double]
-    programs.foldLeft(emptyMap)((map, program) => map + (program -> fitnessFunction(program.evaluate())))
+    programs.foldLeft(emptyMap)((map, program) => map + (program -> fitnessFunction(program.evaluate)))
   }
 
   lazy val adjustedFitnesses = fitnesses.mapValues((fitness) => 1.0 / (1.0 + fitness))

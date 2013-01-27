@@ -41,12 +41,12 @@ trait SpecHelpers {
   }
 
   object HeadEvaluationFunction extends NonterminalNodeFunction[Int](2) {
-    def apply(children: Seq[ProgramNode[Int]]) = children.head.evaluate()
+    def apply(children: Seq[ProgramNode[Int]]) = children.head.evaluate
     def toIdentifier = "head"
   }
 
   object LastEvaluationFunction extends NonterminalNodeFunction[Int](2) {
-    def apply(children: Seq[ProgramNode[Int]]) = children.last.evaluate()
+    def apply(children: Seq[ProgramNode[Int]]) = children.last.evaluate
     def toIdentifier = "last"
   }
 
@@ -62,12 +62,12 @@ trait SpecHelpers {
   }
 
   object SuccessorEvaluationFunction extends NonterminalNodeFunction[Int](1) {
-    def apply(nodes: Seq[ProgramNode[Int]]) = nodes.head.evaluate() + 1
+    def apply(nodes: Seq[ProgramNode[Int]]) = nodes.head.evaluate + 1
     def toIdentifier = "succ"
   }
 
   object NegateEvaluationFunction extends NonterminalNodeFunction[Int](1) {
-    def apply(nodes: Seq[ProgramNode[Int]]) = -(nodes.head.evaluate())
+    def apply(nodes: Seq[ProgramNode[Int]]) = -(nodes.head.evaluate)
     def toIdentifier = "-"
   }
 }

@@ -27,7 +27,7 @@ class PopulationSpec extends Specification with SpecHelpers with Mockito {
   }
 
   "A Population" should {
-    "evaluate its constituent programs for fitness" in {
+    "evaluate its constituent programs for fitness, adjusted fitness, and normalized fitness" in {
       val commonChildren = Array(
         new ProgramNode(ConstantEvaluationFunction42, Array():Array[ProgramNode[Int]], Queue(0)),
         new ProgramNode(ConstantEvaluationFunction666, Array():Array[ProgramNode[Int]], Queue(1))
@@ -37,10 +37,28 @@ class PopulationSpec extends Specification with SpecHelpers with Mockito {
       val testProgram2 = new ProgramNode(LastEvaluationFunction, commonChildren, Queue())
       val population = new Population(List(testProgram1, testProgram2), TestProgramFitnessFunction)
 
+      // population.fitnesses holds what Koza calls "standardized fitness"
+      // (smaller is better)
+
       val fitnessResult = population.fitnesses
       fitnessResult.size mustEqual 2
       fitnessResult(testProgram1) mustEqual 126.0
       fitnessResult(testProgram2) mustEqual 1998.0
+
+      // adjusted fitness maps fitnesses to [0.0, 1.0] and also exaggerates
+      // small differences in fitness, which is generally a win
+
+      val adjustedFitnessResult = population.adjustedFitnesses
+      adjustedFitnessResult.size mustEqual 2
+      adjustedFitnessResult(testProgram1) mustEqual 0.007874015748031496 // 1.0 / (1.0 + fitness)
+      adjustedFitnessResult(testProgram2) mustEqual 5.002501250625312E-4
+
+      // normalized fitness normalized adjusted fitnesses so they sum to 1.0
+
+      val normalizedFitnessResult = population.normalizedFitnesses
+      normalizedFitnessResult.size mustEqual 2
+      normalizedFitnessResult(testProgram1) mustEqual 0.940263405456256
+      normalizedFitnessResult(testProgram2) mustEqual 0.05973659454374412
     }
 
     "pick a program for reproduction proportionate to its fitness" in {
@@ -48,19 +66,18 @@ class PopulationSpec extends Specification with SpecHelpers with Mockito {
       val program2 = new ProgramNode(ConstantEvaluationFunction1337)
       val program3 = new ProgramNode(ConstantEvaluationFunction3456)
 
-      /* The fitnesses we work with are what Koza calls "standardized 
-         fitness", a positive real number where a smaller value indicates
-         a fitter program. So when we choose proportionate to fitness, we
-         actually choose _inversely_ proportionate to standardized fitness. */
-
-      val program1Cutoff = 1.0 / (42 * 3.0)
-      val program2Cutoff = 1.0 / (1337 * 3.0)
-      val program3Cutoff = 1.0 / (3456 * 3.0)
+      /* see notes in previous test regarding standardized vs. adjusted vs.
+         normalized fitness */
 
       val epsilon = 0.00000000001
 
       val population = spy(new Population[Int](List(program1, program2, program3), TestProgramFitnessFunction))
-      population.chooseValueInAllFitnessesRange().returns(0.0).
+
+      val program1Cutoff = population.normalizedFitnesses(program1)
+      val program2Cutoff = population.normalizedFitnesses(program2)
+      val program3Cutoff = population.normalizedFitnesses(program3)
+
+      population.chooseProgramFitnessIndex().returns(0.0).
                                                   thenReturns(program1Cutoff - epsilon).
                                                   thenReturns(program1Cutoff + epsilon).
                                                   thenReturns(program1Cutoff + program2Cutoff - epsilon).
@@ -88,12 +105,12 @@ class PopulationSpec extends Specification with SpecHelpers with Mockito {
          but I can't seem to properly stub chooseProgramForReproduction
          itself, possibly because it's overloaded. */
 
-      val program1Index = 1.0 / (42 * 3.0)
-      val program2Index = 1.0 / (1337 * 3.0)
-      val program3Index = 1.0 / (3456 * 3.0)
+      val program1Index = population.normalizedFitnesses(program1)
+      val program2Index = population.normalizedFitnesses(program2)
+      val program3Index = population.normalizedFitnesses(program3)
       val epsilon = 0.00000000001
 
-      population.chooseValueInAllFitnessesRange().returns(program1Index - epsilon).
+      population.chooseProgramFitnessIndex().returns(program1Index - epsilon).
                                                   thenReturns(program1Index - epsilon).
                                                   thenReturns(program1Index + program2Index + epsilon).
                                                   thenReturns(program1Index - epsilon)
@@ -118,14 +135,14 @@ class PopulationSpec extends Specification with SpecHelpers with Mockito {
       population.bestOfRun mustEqual (goodProgram, 1337.0 * 3)
 
       // same stupid trick as above to get goodProgram twice
-      population.chooseValueInAllFitnessesRange().returns(0.0).thenReturns(0.0)
+      population.chooseProgramFitnessIndex().returns(0.0).thenReturns(0.0)
       goodProgram.crossoverWith(goodProgram).returns(List(badProgram, worseProgram))
 
       val secondGeneration = spy(population.breedNewGeneration)
       secondGeneration.bestOfPreviousGenerations mustEqual Some((goodProgram, 1337.0 * 3))
       secondGeneration.bestOfRun mustEqual (goodProgram, 1337.0 * 3)
 
-      secondGeneration.chooseValueInAllFitnessesRange().returns(0.0).thenReturns(0.0)
+      secondGeneration.chooseProgramFitnessIndex().returns(0.0).thenReturns(0.0)
       badProgram.crossoverWith(badProgram).returns(List(badProgram, bestProgram))
       
       val thirdGeneration = secondGeneration.breedNewGeneration

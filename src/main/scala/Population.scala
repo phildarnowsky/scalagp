@@ -49,6 +49,13 @@ case class Population[ProgramType](
     programs.foldLeft(emptyMap)((map, program) => map + (program -> fitnessFunction(program.evaluate())))
   }
 
+  lazy val adjustedFitnesses = fitnesses.mapValues((fitness) => 1.0 / (1.0 + fitness))
+
+  lazy val normalizedFitnesses = {
+    val fitnessSum = adjustedFitnesses.values.sum
+    adjustedFitnesses.mapValues(_ / fitnessSum)
+  }
+
   lazy val bestOfCurrentGeneration = fitnesses.toList.sortBy(_._2).head
 
   // is there a more idiomatic way to write this?
@@ -78,8 +85,8 @@ case class Population[ProgramType](
        problem, since we just get Infinity, which we can work with. */
 
     chooseProgramForReproduction(
-      chooseValueInAllFitnessesRange(), 
-      fitnesses.toList.map((fitnessTuple) => (fitnessTuple._1, 1.0 / fitnessTuple._2)).sortBy(_._2).reverse
+      chooseProgramFitnessIndex(),
+      normalizedFitnesses.toList.sortBy(_._2).reverse
     )
   }
 
@@ -102,7 +109,7 @@ case class Population[ProgramType](
     )
   }
 
-  def chooseValueInAllFitnessesRange(): Double = fitnesses.map(_._2).sum * rng.nextDouble()
+  def chooseProgramFitnessIndex(): Double = rng.nextDouble()
 }
 
 abstract class ProgramFitnessFunction[InputType] extends Function1[InputType, Double] {

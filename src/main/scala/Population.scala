@@ -41,6 +41,8 @@ object Population {
 case class Population[ProgramType](
   val programs: Seq[ProgramNode[ProgramType]], 
   val fitnessFunction: ProgramFitnessFunction[ProgramType],
+  val crossoverProportion: Double = 0.9,
+  val reproductionProportion: Double = 0.1,
   val bestOfPreviousGenerations: Option[(ProgramNode[ProgramType], Double)] = None
 ) {
 
@@ -100,13 +102,23 @@ case class Population[ProgramType](
   }
 
   def breedNewGeneration: Population[ProgramType] = {
-    val breeders = List.fill(programs.length)(chooseProgramForReproduction())
-    val breedingPairs = breeders.grouped(2)
-
     this.copy(
-      programs = breedingPairs.flatMap((pair) => pair(0).crossoverWith(pair(1))).toList,
+      programs = (breedByCrossover ++ breedByReproduction),
       bestOfPreviousGenerations = Some(this.bestOfRun)
     )
+  }
+
+  def breedByCrossover(): Seq[ProgramNode[ProgramType]] = {
+    val crossoverCount = (programs.length * crossoverProportion).toInt
+    val breeders = List.fill(crossoverCount)(chooseProgramForReproduction())
+    val breedingPairs = breeders.grouped(2)
+
+    breedingPairs.flatMap((pair) => pair(0).crossoverWith(pair(1))).toSeq
+  }
+
+  def breedByReproduction(): Seq[ProgramNode[ProgramType]] = {
+    val reproductionCount = (programs.length * reproductionProportion).toInt
+    List.fill(reproductionCount)(chooseProgramForReproduction())
   }
 
   def chooseProgramFitnessIndex(): Double = rng.nextDouble()

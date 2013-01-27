@@ -10,13 +10,24 @@ object Population {
   def generate[ProgramType, Double](
     trancheSize: Int, 
     generationStrategies: Seq[ProgramGenerationStrategy[ProgramType]],
-    evaluationFunction: ProgramFitnessFunction[ProgramType]
+    evaluationFunction: ProgramFitnessFunction[ProgramType],
+    terminationConditions: List[(Population[_] => Boolean)] = List(),
+    crossoverProportion: scala.Double = 0.9,
+    reproductionProportion: scala.Double = 0.1
   ): Population[ProgramType] = {
 
     val programs = generationStrategies.flatMap(strategy =>
       (1 to trancheSize).map(_ => strategy.generateProgram))
 
-    new Population(programs, evaluationFunction)
+    new Population(programs, evaluationFunction, terminationConditions, crossoverProportion, reproductionProportion)
+  }
+
+  def terminateOnFitness(maxFitness: Double): (Population[_] => Boolean) = {
+    ((population: Population[_]) => population.bestOfRun._2 <= maxFitness)
+  }
+
+  def terminateOnGeneration(maxGeneration: Int): (Population[_] => Boolean) = {
+    ((population: Population[_]) => population.generation >= maxGeneration)
   }
 
   // Convenience method to generate population by the popular ramped half-and-
@@ -26,7 +37,10 @@ object Population {
     maximumDepth: Int,
     nonterminals: Seq[NonterminalNodeFunctionCreator[ProgramType]],
     terminals: Seq[TerminalNodeFunctionCreator[ProgramType]],
-    fitnessFunction: ProgramFitnessFunction[ProgramType]
+    fitnessFunction: ProgramFitnessFunction[ProgramType],
+    terminationConditions: List[(Population[_] => Boolean)] = List(),
+    crossoverProportion: scala.Double = 0.9,
+    reproductionProportion: scala.Double = 0.1
   ) = {
 
     val strategies = (1 to maximumDepth).flatMap((depth: Int) => List(
@@ -34,15 +48,27 @@ object Population {
       new GrowGenerationStrategy(nonterminals, terminals, depth)
     ))
 
-    generate(trancheSize, strategies, fitnessFunction)
+    generate(trancheSize, strategies, fitnessFunction, terminationConditions, crossoverProportion, reproductionProportion)
+  }
+
+  def run(initialPopulation: Population[_]): Population[_] = {
+    var population = initialPopulation
+
+    while(!population.done) {
+      population = population.breedNewGeneration
+    }
+
+    population
   }
 }
 
 case class Population[ProgramType](
   val programs: Seq[ProgramNode[ProgramType]], 
   val fitnessFunction: ProgramFitnessFunction[ProgramType],
+  val terminationConditions: List[(Population[_] => Boolean)] = List(),
   val crossoverProportion: Double = 0.9,
   val reproductionProportion: Double = 0.1,
+  val generation: Int = 1,
   val bestOfPreviousGenerations: Option[(ProgramNode[ProgramType], Double)] = None
 ) {
 
@@ -104,7 +130,8 @@ case class Population[ProgramType](
   def breedNewGeneration: Population[ProgramType] = {
     this.copy(
       programs = (breedByCrossover ++ breedByReproduction),
-      bestOfPreviousGenerations = Some(this.bestOfRun)
+      bestOfPreviousGenerations = Some(this.bestOfRun),
+      generation = this.generation + 1
     )
   }
 
@@ -122,6 +149,8 @@ case class Population[ProgramType](
   }
 
   def chooseProgramFitnessIndex(): Double = rng.nextDouble()
+
+  def done = this.terminationConditions.exists(_(this))
 }
 
 abstract class ProgramFitnessFunction[InputType] extends Function1[InputType, Double] {

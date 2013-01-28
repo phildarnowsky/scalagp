@@ -38,8 +38,4 @@ object PolynomialPopulation {
       fitnessFunction
     )
   }
-
-  //def runRandomRegression(): Population[Polynomial] = {
-    //val initialPopulation = 
-  //}
 }

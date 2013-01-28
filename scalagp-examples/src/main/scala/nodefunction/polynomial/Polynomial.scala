@@ -48,7 +48,7 @@ abstract class BinaryOperator extends NonterminalNodeFunction[Polynomial](2) {
 
 object Add extends BinaryOperator {
   def apply(children: Seq[ProgramNode[Polynomial]]): Polynomial = {
-    children(0).evaluate() + children(1).evaluate()
+    children(0).evaluate + children(1).evaluate
   }
 
   def toIdentifier = "+"
@@ -56,7 +56,7 @@ object Add extends BinaryOperator {
 
 object Multiply extends BinaryOperator {
   def apply(children: Seq[ProgramNode[Polynomial]]): Polynomial = {
-    children(0).evaluate() * children(1).evaluate()
+    children(0).evaluate * children(1).evaluate
   }
 
   def toIdentifier = "*"

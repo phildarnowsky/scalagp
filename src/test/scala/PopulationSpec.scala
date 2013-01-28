@@ -46,6 +46,21 @@ class PopulationSpec extends Specification with SpecHelpers with Mockito {
       result.bestOfRun._2 must beLessThanOrEqualTo(4010.0)
       result.generation mustEqual 3
     }
+
+    "call a hook before breeding a new generation" in {
+      class HookTarget {
+        def someMethod(): Unit = {
+        }
+      }
+
+      val testTarget = spy(new HookTarget)
+      val pokeHookTarget = ((pop: Population[_]) => testTarget.someMethod)
+
+      val population = Population.generateRampedHalfAndHalf(10, 2, List(HeadEvaluationFunction, LastEvaluationFunction), List(ConstantEvaluationFunction42, ConstantEvaluationFunction666), TestProgramFitnessFunction, List(Population.terminateOnGeneration(2)))
+
+      Population.run(population, Some(pokeHookTarget))
+      there was one(testTarget).someMethod()
+    }
   }
 
   "A Population" should {

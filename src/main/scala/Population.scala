@@ -51,14 +51,19 @@ object Population {
     generate(trancheSize, strategies, fitnessFunction, terminationConditions, crossoverProportion, reproductionProportion)
   }
 
-  def run(initialPopulation: Population[_]): Population[_] = {
+  def run(initialPopulation: Population[_], beforeBreedingHook: Option[Population[_] => Unit] = None): Population[_] = {
     var population = initialPopulation
 
     while(!population.done) {
+      beforeBreedingHook.foreach(_(population))
       population = population.breedNewGeneration
     }
 
     population
+  }
+
+  def printGenerationStatistics(population: Population[_]): Unit = {
+    println("GENERATION " ++ population.generation.toString)
   }
 }
 

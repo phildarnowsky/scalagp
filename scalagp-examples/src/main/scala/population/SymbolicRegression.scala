@@ -29,13 +29,15 @@ object PolynomialPopulation {
   def create(
     trancheSize: Int, 
     maximumDepth: Int, 
-    fitnessFunction: SymbolicRegressionFitnessFunction): Population[Polynomial] = {
+    fitnessFunction: SymbolicRegressionFitnessFunction,
+    maxFitness: Double): Population[Polynomial] = {
     Population.generateRampedHalfAndHalf(
       trancheSize,
       maximumDepth,
       List(Add, Multiply),
       List(IndependentVariable, new ERCNodeFunctionCreator(-10.0, 10.0)),
-      fitnessFunction
+      fitnessFunction,
+      List(Population.terminateOnFitness(maxFitness), Population.terminateOnGeneration(10000))
     )
   }
 }

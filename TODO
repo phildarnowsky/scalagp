@@ -5,6 +5,7 @@ CHORES
 * Write README with some semblance of dox
 
 NICE TO HAVE
+* Termination condition on improvement stalled
 * Overselection
 * Elite reproduction
 * Tournament selection

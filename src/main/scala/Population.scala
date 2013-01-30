@@ -63,7 +63,11 @@ object Population {
   }
 
   def printGenerationStatistics(population: Population[_]): Unit = {
+    println("*******************")
     println("GENERATION " ++ population.generation.toString)
+    println("BEST FITNESS OF CURRENT GENERATION: " ++ population.bestOfCurrentGeneration._2.toString)
+    println("BEST FITNESS OF RUN: " ++ population.bestOfRun._2.toString)
+    println("")
   }
 }
 

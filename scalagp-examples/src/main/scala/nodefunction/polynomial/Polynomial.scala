@@ -28,7 +28,14 @@ object Monomial {
   def X = new Monomial(1, 1)
 }
 
-class Polynomial(val terms:Seq[Monomial]) {
+class Polynomial(val uncollectedTerms:Seq[Monomial]) {
+  lazy val terms: Seq[Monomial] = {
+    uncollectedTerms.groupBy(_.power).toList.map{
+      (pair: (Int, Seq[Monomial])) =>
+      new Monomial(pair._2.map(_.coefficient).sum, pair._1)
+    }
+  }
+
   override def toString = terms.map(_.toString) mkString " + "
 
   def * (that: Polynomial): Polynomial = {

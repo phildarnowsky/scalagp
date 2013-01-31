@@ -15,6 +15,9 @@ NICE TO HAVE
 * Hooks for visualizers
 * Adapters for Hadoop/EMR
 
+EXAMPLES
+* Implement a few more examples out of Koza's book
+
 CODE QUALITY
 * Change all those (Program, Fitness) tuples that litter the code into proper objects
 * Attempts to breed an odd number of programs by crossover should be handled gracefully

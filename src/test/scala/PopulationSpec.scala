@@ -47,6 +47,24 @@ class PopulationSpec extends Specification with SpecHelpers with Mockito {
       result.generation mustEqual 3
     }
 
+    "terminate on fitness plateauing for too long" in {
+      val badProgram = spy(new ProgramNode(ConstantEvaluationFunction78910))
+      val mediocreProgram = spy(new ProgramNode(ConstantEvaluationFunction1337))
+
+      val population = new Population[Int](List.fill(100)(badProgram), TestProgramFitnessFunction, List(Population.terminateOnFitnessPlateau(5)))
+
+      badProgram.crossoverWith(badProgram).returns(List.fill(2)(mediocreProgram))
+      mediocreProgram.crossoverWith(mediocreProgram).returns(List.fill(2)(mediocreProgram))
+
+      val result = Population.run(population)
+      result.bestOfRun._2 mustEqual 4011.0
+
+      /* Generation 1 improves by default (since there was no previous best)
+         Generation 2 improves by breeding mediocreProgram
+         Generations 3-7 plateau */
+      result.generation mustEqual 7
+    }
+
     "call a hook before breeding a new generation" in {
       class HookTarget {
         def someMethod(): Unit = {

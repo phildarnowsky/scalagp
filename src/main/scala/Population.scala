@@ -30,6 +30,10 @@ object Population {
     ((population: Population[_]) => population.generation >= maxGeneration)
   }
 
+  def terminateOnFitnessPlateau(plateauGenerations: Int): (Population[_] => Boolean) = {
+    ((population: Population[_]) => population.generationsWithoutImprovement >= plateauGenerations)
+  }
+
   // Convenience method to generate population by the popular ramped half-and-
   // half method.
   def generateRampedHalfAndHalf[ProgramType, Double] (
@@ -78,7 +82,8 @@ case class Population[ProgramType](
   val crossoverProportion: Double = 0.9,
   val reproductionProportion: Double = 0.1,
   val generation: Int = 1,
-  val bestOfPreviousGenerations: Option[(ProgramNode[ProgramType], Double)] = None
+  val bestOfPreviousGenerations: Option[(ProgramNode[ProgramType], Double)] = None,
+  val previousGenerationsWithoutImprovement: Int = 0
 ) {
 
   lazy val fitnesses = {
@@ -140,8 +145,23 @@ case class Population[ProgramType](
     this.copy(
       programs = (breedByCrossover ++ breedByReproduction),
       bestOfPreviousGenerations = Some(this.bestOfRun),
-      generation = this.generation + 1
+      generation = this.generation + 1,
+      previousGenerationsWithoutImprovement = generationsWithoutImprovement
     )
+  }
+
+  def generationsWithoutImprovement: Int = {
+    if(didBestOfRunImprove)
+      0 
+    else 
+      previousGenerationsWithoutImprovement + 1
+  }
+
+  def didBestOfRunImprove(): Boolean = {
+    bestOfPreviousGenerations match {
+      case None => true
+      case Some(oldbest) => (bestOfCurrentGeneration._2 < oldbest._2)
+    }
   }
 
   def breedByCrossover(): Seq[ProgramNode[ProgramType]] = {

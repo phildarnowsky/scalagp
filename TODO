@@ -5,7 +5,6 @@ CHORES
 * Write README with some semblance of dox
 
 NICE TO HAVE
-* Termination condition on improvement stalled
 * Overselection
 * Elite reproduction
 * Tournament selection
@@ -15,3 +14,7 @@ NICE TO HAVE
 * Optimize programs
 * Hooks for visualizers
 * Adapters for Hadoop/EMR
+
+CODE QUALITY
+* Change all those (Program, Fitness) tuples that litter the code into proper objects
+* Attempts to breed an odd number of programs by crossover should be handled gracefully

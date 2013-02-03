@@ -18,6 +18,7 @@ object FindRootPopulation {
       maximumDepth,
       List(AddFunction, SubtractFunction, MultiplyFunction, ProtectedDivideFunction),
       List(new ERCNodeFunctionCreator(-10.0, 10.0)),
-      RootFinderFitnessFunction
+      RootFinderFitnessFunction,
+      List(Population.terminateOnFitness(0.01), Population.terminateOnGeneration(51))
     )}
 }

@@ -42,7 +42,7 @@ object Population {
     nonterminals: Seq[NonterminalNodeFunctionCreator[ProgramType]],
     terminals: Seq[TerminalNodeFunctionCreator[ProgramType]],
     fitnessFunction: ProgramFitnessFunction[ProgramType],
-    terminationConditions: List[(Population[_] => Boolean)] = List(),
+    terminationConditions: List[(Population[_] => Boolean)] = List(Population.terminateOnFitness(0.0)),
     crossoverProportion: scala.Double = 0.9,
     reproductionProportion: scala.Double = 0.1
   ) = {

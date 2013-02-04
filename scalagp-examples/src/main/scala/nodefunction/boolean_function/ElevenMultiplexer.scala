@@ -58,7 +58,7 @@ class AddressLineNodeFunction(lineIndex: Int) extends TerminalNodeFunction[Boole
 
 class DataLineNodeFunction(lineIndex: Int) extends TerminalNodeFunction[BooleanFunction] {
   def toIdentifier = "D" ++ lineIndex.toString
-  def apply(_children: Seq[ProgramNode[BooleanFunction]]) = new LineFunction(lineIndex + 8)
+  def apply(_children: Seq[ProgramNode[BooleanFunction]]) = new LineFunction(lineIndex + 3)
 }
 
 object Address0NodeFunction extends AddressLineNodeFunction(0) {

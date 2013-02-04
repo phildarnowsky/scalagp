@@ -17,5 +17,17 @@ class ElevenMultiplexerFitnessCase(caseIndex: Int) {
 object ElevenMultiplexerFitnessFunction extends ProgramFitnessFunction[BooleanFunction] {
   val fitnessCases = (0 to 2047).map(new ElevenMultiplexerFitnessCase(_))
 
-  def apply(booleanFunction: BooleanFunction) = fitnessCases.count((fitnessCase) => fitnessCase.incorrect(booleanFunction)).toDouble
+  def apply(booleanFunction: BooleanFunction) = fitnessCases.par.count((fitnessCase) => fitnessCase.incorrect(booleanFunction)).toDouble
+}
+
+object ElevenMultiplexerPopulation {
+  def create(trancheSize: Int, maximumDepth: Int) = {
+    Population.generateRampedHalfAndHalf(
+      trancheSize,
+      maximumDepth,
+      List(AndNodeFunction, OrNodeFunction, NotNodeFunction, IfNodeFunction),
+      List(Address0NodeFunction, Address1NodeFunction, Address2NodeFunction, Data0NodeFunction, Data1NodeFunction, Data2NodeFunction, Data3NodeFunction, Data4NodeFunction, Data5NodeFunction, Data6NodeFunction, Data7NodeFunction),
+      ElevenMultiplexerFitnessFunction
+    )
+  }
 }

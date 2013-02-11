@@ -17,7 +17,7 @@ class ElevenMultiplexerFitnessCase(caseIndex: Int) {
 object ElevenMultiplexerFitnessFunction extends ProgramFitnessFunction[BooleanFunction] {
   val fitnessCases = (0 to 2047).map(new ElevenMultiplexerFitnessCase(_))
 
-  def apply(booleanFunction: BooleanFunction) = fitnessCases.par.count((fitnessCase) => fitnessCase.incorrect(booleanFunction)).toDouble
+  def apply(booleanFunction: BooleanFunction) = fitnessCases.count((fitnessCase) => fitnessCase.incorrect(booleanFunction)).toDouble
 }
 
 object ElevenMultiplexerPopulation {

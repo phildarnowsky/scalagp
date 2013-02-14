@@ -73,6 +73,20 @@ object Population {
     println("BEST FITNESS OF RUN: " ++ population.bestOfRun._2.toString)
     println("")
   }
+
+  def printExtendedGenerationStatistics(population: Population[_]): Unit = {
+    println("*******************")
+    println("GENERATION " ++ population.generation.toString)
+    println("BEST FITNESS OF CURRENT GENERATION: " ++ population.bestOfCurrentGeneration._2.toString)
+    println("BEST FITNESS OF RUN: " ++ population.bestOfRun._2.toString)
+
+    val minDepth = population.programs.map(_.depth).min
+    val maxDepth = population.programs.map(_.depth).max
+    val avgDepth = population.programs.map(_.depth).sum.toDouble / population.programs.length
+
+    println("MIN/AVG/MAX DEPTH: " ++ minDepth.toString ++ "/" ++ avgDepth.toString ++ "/" ++ maxDepth.toString)
+    println("")
+  }
 }
 
 case class Population[ProgramType](

@@ -1,11 +1,11 @@
 MUST HAVE
-None
+* Depth limit on crossover
+* Overselection
 
 CHORES
 * Write README with some semblance of dox
 
 NICE TO HAVE
-* Overselection
 * Elite reproduction
 * Tournament selection
 * Rank selection

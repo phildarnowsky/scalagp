@@ -5,6 +5,7 @@ import com.darnowsky.scalagp.FullGenerationStrategy.FullGenerationStrategy
 import com.darnowsky.scalagp.GrowGenerationStrategy.GrowGenerationStrategy
 import com.darnowsky.scalagp.ProgramNode.ProgramNode
 import com.darnowsky.scalagp.NodeFunction.{NonterminalNodeFunctionCreator, TerminalNodeFunctionCreator}
+import scala.collection.immutable.HashMap
 
 object Population {
   def generate[ProgramType, Double](
@@ -97,12 +98,12 @@ case class Population[ProgramType](
   val reproductionProportion: Double = 0.1,
   val generation: Int = 1,
   val bestOfPreviousGenerations: Option[(ProgramNode[ProgramType], Double)] = None,
-  val previousGenerationsWithoutImprovement: Int = 0
+  val previousGenerationsWithoutImprovement: Int = 0,
+  val knownFitnesses: Map[ProgramNode[ProgramType], Double] = new HashMap[ProgramNode[ProgramType], Double]
 ) {
 
   lazy val fitnesses = {
-    val emptyMap = new scala.collection.immutable.HashMap[ProgramNode[ProgramType], Double]
-    programs.foldLeft(emptyMap)((map, program) => map + (program -> fitnessFunction(program.evaluate)))
+    programs.foldLeft(knownFitnesses)((map, program) => map + (program -> fitnessFunction(program.evaluate)))
   }
 
   lazy val adjustedFitnesses = fitnesses.mapValues((fitness) => 1.0 / (1.0 + fitness))
@@ -156,11 +157,17 @@ case class Population[ProgramType](
   }
 
   def breedNewGeneration: Population[ProgramType] = {
+    val programsFromCrossover = breedByCrossover
+    val programsAndFitnessesFromReproduction = breedByReproduction
+    val programsFromReproduction = programsAndFitnessesFromReproduction.map(_._1)
+    val newKnownFitnesses = programsAndFitnessesFromReproduction.toMap
+
     this.copy(
-      programs = (breedByCrossover ++ breedByReproduction),
+      programs = (programsFromCrossover ++ programsFromReproduction),
       bestOfPreviousGenerations = Some(this.bestOfRun),
       generation = this.generation + 1,
-      previousGenerationsWithoutImprovement = generationsWithoutImprovement
+      previousGenerationsWithoutImprovement = generationsWithoutImprovement,
+      knownFitnesses = newKnownFitnesses
     )
   }
 
@@ -186,9 +193,12 @@ case class Population[ProgramType](
     breedingPairs.flatMap((pair) => pair(0).crossoverWith(pair(1))).toSeq
   }
 
-  def breedByReproduction(): Seq[ProgramNode[ProgramType]] = {
+  def breedByReproduction(): Seq[(ProgramNode[ProgramType], Double)] = {
     val reproductionCount = (programs.length * reproductionProportion).toInt
-    List.fill(reproductionCount)(chooseProgramForReproduction())
+    List.fill(reproductionCount){
+      val chosenProgram = chooseProgramForReproduction()
+      (chosenProgram, fitnesses(chosenProgram))
+    }
   }
 
   def chooseProgramFitnessIndex(): Double = rng.nextDouble()

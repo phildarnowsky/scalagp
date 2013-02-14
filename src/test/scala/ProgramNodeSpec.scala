@@ -202,5 +202,15 @@ class ProgramNodeSpec extends Specification with Mockito with SpecHelpers {
       descendantList.contains(topNode.children(1).children(0)) must beTrue
       descendantList.contains(topNode.children(1).children(1)) must beTrue
     }
+
+    "be able to calculate the depth of the subtree rooted at itself" in {
+      topNode.depth mustEqual 3
+      topNode.children(0).depth mustEqual 2
+      topNode.children(1).depth mustEqual 2
+      topNode.children(0).children(0).depth mustEqual 1
+      topNode.children(0).children(1).depth mustEqual 1
+      topNode.children(1).children(0).depth mustEqual 1
+      topNode.children(1).children(1).depth mustEqual 1
+    }
   }
 }

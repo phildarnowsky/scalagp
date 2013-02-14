@@ -40,6 +40,8 @@ case class ProgramNode[T](
 
   def chooseRandomDescendant(): ProgramNode[T] = allDescendants(rng.nextInt(allDescendants.length))
 
+  lazy val depth = allDescendants.map(_.pathFromRoot.length).max - pathFromRoot.length + 1
+
   protected
 
   lazy val rng = new scala.util.Random

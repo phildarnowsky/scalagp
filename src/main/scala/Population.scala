@@ -194,7 +194,7 @@ case class Population[ProgramType](
     val breeders = List.fill(crossoverCount)(chooseProgramForReproduction())
     val breedingPairs = breeders.grouped(2)
 
-    breedingPairs.flatMap((pair) => pair(0).crossoverWith(pair(1))).toSeq
+    breedingPairs.flatMap((pair) => pair(0).crossoverWith(pair(1), depthLimit)).toSeq
   }
 
   def breedByReproduction(): Seq[(ProgramNode[ProgramType], Double)] = {

@@ -27,7 +27,9 @@ object ElevenMultiplexerPopulation {
       maximumDepth,
       List(AndNodeFunction, OrNodeFunction, NotNodeFunction, IfNodeFunction),
       List(Address0NodeFunction, Address1NodeFunction, Address2NodeFunction, Data0NodeFunction, Data1NodeFunction, Data2NodeFunction, Data3NodeFunction, Data4NodeFunction, Data5NodeFunction, Data6NodeFunction, Data7NodeFunction),
-      ElevenMultiplexerFitnessFunction
+      ElevenMultiplexerFitnessFunction,
+      List(Population.terminateOnFitness(0.0)),
+      Some(15)
     )
   }
 }

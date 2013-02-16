@@ -20,13 +20,22 @@ case class ProgramNode[T](
 
   lazy val evaluate: T = evaluationFunction(children)
 
-  def crossoverWith(that: ProgramNode[T]): Seq[ProgramNode[T]] = {
+  def crossoverWith(that: ProgramNode[T], depthLimit: Option[Int] = None): Seq[ProgramNode[T]] = {
     val thisCrossoverPoint = this.chooseRandomDescendant()
     val thatCrossoverPoint = that.chooseRandomDescendant()
 
     val thisNewTree = this.insertReplacementSubtree(thatCrossoverPoint, thisCrossoverPoint.pathFromRoot)
     val thatNewTree = that.insertReplacementSubtree(thisCrossoverPoint, thatCrossoverPoint.pathFromRoot)
-    List(thisNewTree, thatNewTree)
+
+    depthLimit match {
+      case None    => List(thisNewTree, thatNewTree)
+      case Some(x) => {
+        // enforce depth limit
+        val clippedThisNewTree = if (thisNewTree.depth > x) this else thisNewTree
+        val clippedThatNewTree = if (thatNewTree.depth > x) this else thatNewTree
+        List(clippedThisNewTree, clippedThatNewTree)
+      }
+    }
   }
 
   def toSExpression(): String = {

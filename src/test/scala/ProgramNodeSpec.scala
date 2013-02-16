@@ -113,7 +113,7 @@ class ProgramNodeSpec extends Specification with Mockito with SpecHelpers {
       child2.children(0).children(1).children(1).children(0).pathFromRoot mustEqual Queue (0, 1, 1, 0) // 666
     }
 
-    "be able to do crossover reproduction with another ProgramNode" in {  
+    "be able to do crossover reproduction with another ProgramNode" in {
       val spiedProgram1 = spy(program1)
       val spiedProgram2 = spy(program2)
 
@@ -142,6 +142,22 @@ class ProgramNodeSpec extends Specification with Mockito with SpecHelpers {
       child2.children(0).children(0).children(0).pathFromRoot mustEqual Queue(0, 0, 0) // 1337
       child2.children(0).children(1).pathFromRoot mustEqual Queue(0, 1) // 42
     }  
+
+    "enforce a limit on maximum crossover depth, which if breached the first parent gets returned" in {
+      val spiedProgram1 = spy(program1)
+      val spiedProgram2 = spy(program2)
+    // program1 is (+ 42 (- 666))
+    // program2 is (- (* (succ 1337) (+ 3456 78910)))
+
+      spiedProgram1.chooseRandomDescendant().returns(spiedProgram1.children(1)) // choose the (- 666) node
+      spiedProgram2.chooseRandomDescendant().returns(spiedProgram2) // choose the root
+
+      // crossover would yield a program with depth 5 as the first child
+      spiedProgram1.crossoverWith(spiedProgram2, Some(4))(0) mustEqual spiedProgram1
+
+      // crossover would yield a program with depth 2 as the second child
+      spiedProgram1.crossoverWith(spiedProgram2, Some(1))(1) mustEqual spiedProgram1
+    }
 
     "be able to evaluate itself" in {
       val constantNode = new ProgramNode[Int](ConstantEvaluationFunction42, Array():Array[ProgramNode[Int]])

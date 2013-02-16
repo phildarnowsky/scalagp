@@ -13,6 +13,7 @@ object Population {
     generationStrategies: Seq[ProgramGenerationStrategy[ProgramType]],
     evaluationFunction: ProgramFitnessFunction[ProgramType],
     terminationConditions: List[(Population[_] => Boolean)] = List(),
+    depthLimit: Option[Int] = None,
     crossoverProportion: scala.Double = 0.9,
     reproductionProportion: scala.Double = 0.1
   ): Population[ProgramType] = {
@@ -20,7 +21,7 @@ object Population {
     val programs = generationStrategies.flatMap(strategy =>
       (1 to trancheSize).map(_ => strategy.generateProgram))
 
-    new Population(programs, evaluationFunction, terminationConditions, crossoverProportion, reproductionProportion)
+    new Population(programs, evaluationFunction, terminationConditions, depthLimit, crossoverProportion, reproductionProportion)
   }
 
   def terminateOnFitness(maxFitness: Double): (Population[_] => Boolean) = {
@@ -44,6 +45,7 @@ object Population {
     terminals: Seq[TerminalNodeFunctionCreator[ProgramType]],
     fitnessFunction: ProgramFitnessFunction[ProgramType],
     terminationConditions: List[(Population[_] => Boolean)] = List(Population.terminateOnFitness(0.0)),
+    depthLimit: Option[Int] = None,
     crossoverProportion: scala.Double = 0.9,
     reproductionProportion: scala.Double = 0.1
   ) = {
@@ -53,7 +55,7 @@ object Population {
       new GrowGenerationStrategy(nonterminals, terminals, depth)
     ))
 
-    generate(trancheSize, strategies, fitnessFunction, terminationConditions, crossoverProportion, reproductionProportion)
+    generate(trancheSize, strategies, fitnessFunction, terminationConditions, depthLimit, crossoverProportion, reproductionProportion)
   }
 
   def run(initialPopulation: Population[_], beforeBreedingHook: Option[Population[_] => Unit] = None): Population[_] = {
@@ -90,10 +92,12 @@ object Population {
   }
 }
 
+// TODO: this is getting to be a silly number of parameters, break some out
 case class Population[ProgramType](
   val programs: Seq[ProgramNode[ProgramType]], 
   val fitnessFunction: ProgramFitnessFunction[ProgramType],
   val terminationConditions: List[(Population[_] => Boolean)] = List(),
+  val depthLimit: Option[Int] = None,
   val crossoverProportion: Double = 0.9,
   val reproductionProportion: Double = 0.1,
   val generation: Int = 1,

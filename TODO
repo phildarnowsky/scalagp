@@ -1,8 +1,5 @@
 MUST HAVE
-* Depth limit on crossover
 * Overselection
-
-CHORES
 * Write README with some semblance of dox
 
 NICE TO HAVE
@@ -21,3 +18,4 @@ EXAMPLES
 CODE QUALITY
 * Change all those (Program, Fitness) tuples that litter the code into proper objects
 * Attempts to breed an odd number of programs by crossover should be handled gracefully
+* Break up the giant Population param list

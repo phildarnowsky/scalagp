@@ -5,7 +5,9 @@ import com.darnowsky.scalagp.FullGenerationStrategy.FullGenerationStrategy
 import com.darnowsky.scalagp.GrowGenerationStrategy.GrowGenerationStrategy
 import com.darnowsky.scalagp.ProgramNode.ProgramNode
 import com.darnowsky.scalagp.NodeFunction.{NonterminalNodeFunctionCreator, TerminalNodeFunctionCreator}
+
 import scala.collection.immutable.HashMap
+import scala.annotation.tailrec
 
 object Population {
   def generate[ProgramType, Double](
@@ -136,28 +138,20 @@ case class Population[ProgramType](
      just like mother used to make. */
 
   def chooseProgramForReproduction(): ProgramNode[ProgramType] = {
-    /* As noted in PopulationSpec, the fitness values we have are what is
-       called "standardized fitness", where a smaller value indicates a more
-       fit program--think of it as an error value as compared to a perfect
-       solution, which would have a standardized fitness of 0.
-       
-       So, to do fitness-proportionate selection, we use the reciprocal of the
-       fitness value as a normalized fitness value. Division by zero is not a
-       problem, since we just get Infinity, which we can work with. */
+    @tailrec
+    def chooseProgramForReproductionAcc(index: Double, programsInDescendingFitness: List[(ProgramNode[ProgramType], Double)]): ProgramNode[ProgramType] = {
+      val(firstProgram, firstProgramFitness) = programsInDescendingFitness.head
+      
+      if(index <= firstProgramFitness || programsInDescendingFitness.tail.isEmpty) // the second clause is a little hack to deal with imprecision of double arithmetic
+        firstProgram
+      else
+        chooseProgramForReproductionAcc(index - firstProgramFitness, programsInDescendingFitness.tail)
+    }
 
-    chooseProgramForReproduction(
+    chooseProgramForReproductionAcc(
       chooseProgramFitnessIndex(),
       normalizedFitnesses.toList.sortBy(_._2).reverse
     )
-  }
-
-  def chooseProgramForReproduction(index: Double, programsInDescendingFitness: List[(ProgramNode[ProgramType], Double)]): ProgramNode[ProgramType] = {
-    val(firstProgram, firstProgramFitness) = programsInDescendingFitness.head
-    
-    if(index <= firstProgramFitness || programsInDescendingFitness.tail.isEmpty) // the second clause is a little hack to deal with imprecision of double arithmetic
-      firstProgram
-    else
-      chooseProgramForReproduction(index - firstProgramFitness, programsInDescendingFitness.tail)
   }
 
   def breedNewGeneration: Population[ProgramType] = {

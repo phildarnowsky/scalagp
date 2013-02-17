@@ -1,8 +1,9 @@
 MUST HAVE
-* Overselection
 * Write README with some semblance of dox
 
 NICE TO HAVE
+* Bias node selection in crossover by terminal/nonterminal status (i.e. node selection is 90% likely to choose an internal node)
+* Overselection
 * Elite reproduction
 * Tournament selection
 * Rank selection
@@ -19,3 +20,4 @@ CODE QUALITY
 * Change all those (Program, Fitness) tuples that litter the code into proper objects
 * Attempts to breed an odd number of programs by crossover should be handled gracefully
 * Break up the giant Population param list
+* Do the tests rely too heavily on spying?

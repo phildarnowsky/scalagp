@@ -57,7 +57,6 @@ case class ProgramNode[T](
 
   def insertReplacementSubtree(that: ProgramNode[T], position: Queue[Int]): ProgramNode[T] = {
     val newSubtree = that.updatePathFromRoot(position)
-    // todo: map over children applying copyToPosition to them to fix up positions
     if(position.isEmpty) {
       newSubtree
     } else {

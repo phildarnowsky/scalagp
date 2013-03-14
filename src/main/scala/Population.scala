@@ -78,20 +78,6 @@ object Population {
     println("BEST FITNESS OF RUN: " ++ population.bestOfRun._2.toString)
     println("")
   }
-
-  def printExtendedGenerationStatistics(population: Population[_]): Unit = {
-    println("*******************")
-    println("GENERATION " ++ population.generation.toString)
-    println("BEST FITNESS OF CURRENT GENERATION: " ++ population.bestOfCurrentGeneration._2.toString)
-    println("BEST FITNESS OF RUN: " ++ population.bestOfRun._2.toString)
-
-    val minDepth = population.programs.map(_.depth).min
-    val maxDepth = population.programs.map(_.depth).max
-    val avgDepth = population.programs.map(_.depth).sum.toDouble / population.programs.length
-
-    println("MIN/AVG/MAX DEPTH: " ++ minDepth.toString ++ "/" ++ avgDepth.toString ++ "/" ++ maxDepth.toString)
-    println("")
-  }
 }
 
 // TODO: this is getting to be a silly number of parameters, break some out
@@ -118,6 +104,8 @@ case class Population[ProgramType](
     val fitnessSum = adjustedFitnesses.values.sum
     adjustedFitnesses.mapValues(_ / fitnessSum)
   }
+
+  lazy val normalizedFitnessesInDescendingFitnessOrder = normalizedFitnesses.toList.sortBy(_._2).reverse
 
   lazy val bestOfCurrentGeneration = fitnesses.toList.sortBy(_._2).head
 
@@ -150,7 +138,7 @@ case class Population[ProgramType](
 
     chooseProgramForReproductionAcc(
       chooseProgramFitnessIndex(),
-      normalizedFitnesses.toList.sortBy(_._2).reverse
+      normalizedFitnessesInDescendingFitnessOrder
     )
   }
 
@@ -188,7 +176,7 @@ case class Population[ProgramType](
     val breeders = List.fill(crossoverCount)(chooseProgramForReproduction())
     val breedingPairs = breeders.grouped(2)
 
-    breedingPairs.flatMap((pair) => pair(0).crossoverWith(pair(1), depthLimit)).toSeq
+    breedingPairs.flatMap((pair) => pair(0).crossoverWith(pair(1), depthLimit)).toList
   }
 
   def breedByReproduction(): Seq[(ProgramNode[ProgramType], Double)] = {

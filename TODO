@@ -1,9 +1,9 @@
 MUST HAVE
+* Overselection
+* Bias node selection in crossover by terminal/nonterminal status (i.e. node selection is 90% likely to choose an internal node)
 * Write README with some semblance of dox
 
 NICE TO HAVE
-* Bias node selection in crossover by terminal/nonterminal status (i.e. node selection is 90% likely to choose an internal node)
-* Overselection
 * Elite reproduction
 * Tournament selection
 * Rank selection
@@ -12,6 +12,7 @@ NICE TO HAVE
 * Optimize programs
 * Hooks for visualizers
 * Adapters for Hadoop/EMR
+* Save and load programs
 
 EXAMPLES
 * Implement a few more examples out of Koza's book

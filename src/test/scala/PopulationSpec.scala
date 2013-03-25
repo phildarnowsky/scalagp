@@ -84,12 +84,12 @@ class PopulationSpec extends Specification with SpecHelpers with Mockito {
   "A Population" should {
     "evaluate its constituent programs for fitness, adjusted fitness, and normalized fitness" in {
       val commonChildren = Array(
-        new ProgramNode(ConstantEvaluationFunction42, Array():Array[ProgramNode[Int]], Queue(0)),
-        new ProgramNode(ConstantEvaluationFunction666, Array():Array[ProgramNode[Int]], Queue(1))
+        new ProgramNode(ConstantEvaluationFunction42, Array():Array[ProgramNode[Int]], Some(0)),
+        new ProgramNode(ConstantEvaluationFunction666, Array():Array[ProgramNode[Int]], Some(1))
       )
 
-      val testProgram1 = new ProgramNode(HeadEvaluationFunction, commonChildren, Queue())
-      val testProgram2 = new ProgramNode(LastEvaluationFunction, commonChildren, Queue())
+      val testProgram1 = new ProgramNode(HeadEvaluationFunction, commonChildren, None)
+      val testProgram2 = new ProgramNode(LastEvaluationFunction, commonChildren, None)
       val population = new Population(List(testProgram1, testProgram2), TestProgramFitnessFunction)
 
       // population.fitnesses holds what Koza calls "standardized fitness"
@@ -165,17 +165,22 @@ class PopulationSpec extends Specification with SpecHelpers with Mockito {
       val program3Index = population.normalizedFitnesses(program3)
       val epsilon = 0.00000000001
 
-      population.chooseProgramFitnessIndex().returns(program1Index - epsilon).
-                                                  thenReturns(program1Index - epsilon).
-                                                  thenReturns(program1Index + program2Index + epsilon).
-                                                  thenReturns(program1Index - epsilon)
-      
-      program1.crossoverWith(program1).returns(List(program3, program1))
-      program3.crossoverWith(program1).returns(List(program2, program1))
+      population.chooseProgramForReproduction.returns(program1).
+                                              thenReturns(program1).
+                                              thenReturns(program3).
+                                              thenReturns(program1)
+/*      population.chooseProgramFitnessIndex().returns(program1Index - epsilon).*/
+                                                  //thenReturns(program1Index - epsilon).
+                                                  //thenReturns(program1Index + program2Index + epsilon).
+                                                  //thenReturns(program1Index - epsilon)
+     
+      //program1.crossoverWith(program1).returns(List(program3, program1))
+      //program3.crossoverWith(program1).returns(List(program2, program1))
+      pending
 
-      val newGeneration = population.breedNewGeneration
+/*      val newGeneration = population.breedNewGeneration*/
 
-      newGeneration.programs mustEqual List(program3, program1, program2, program1)
+      /*newGeneration.programs mustEqual List(program3, program1, program2, program1)*/
     }
 
     "create a new generation by reproduction chosen by fitness-proportionate selection" in {

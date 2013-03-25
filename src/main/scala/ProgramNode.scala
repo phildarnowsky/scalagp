@@ -7,25 +7,25 @@ import scala.collection.immutable.Queue
 case class ProgramNode[T](
   val evaluationFunction: NodeFunction[T],
   val children: IndexedSeq[ProgramNode[T]] = Vector[ProgramNode[T]](),
-  val pathFromRoot:Queue[Int] = Queue()
+  val parentIndex: Option[Int] = None
 ) {
 
  def this(
     evaluationFunction: NodeFunction[T],
-    childrenCreationStrategy: ProgramGenerationStrategy[T], 
-    pathFromRoot:Queue[Int]
+    childrenCreationStrategy: ProgramGenerationStrategy[T],
+    parentIndex: Option[Int]
   ) = {
-    this(evaluationFunction, childrenCreationStrategy.generateChildren(evaluationFunction.arity, pathFromRoot), pathFromRoot)
+    this(evaluationFunction, childrenCreationStrategy.generateChildren(evaluationFunction.arity), parentIndex)
   }
 
   lazy val evaluate: T = evaluationFunction(children)
 
   def crossoverWith(that: ProgramNode[T], depthLimit: Option[Int] = None): Seq[ProgramNode[T]] = {
-    val thisCrossoverPoint = this.chooseRandomDescendant()
-    val thatCrossoverPoint = that.chooseRandomDescendant()
+    val (thisCrossoverNode, thisCrossoverPath) = this.chooseRandomDescendant()
+    val (thatCrossoverNode, thatCrossoverPath) = that.chooseRandomDescendant()
 
-    val thisNewTree = this.insertReplacementSubtree(thatCrossoverPoint, thisCrossoverPoint.pathFromRoot)
-    val thatNewTree = that.insertReplacementSubtree(thisCrossoverPoint, thatCrossoverPoint.pathFromRoot)
+    val thisNewTree = this.insertReplacementSubtree(thatCrossoverNode, thisCrossoverPath)
+    val thatNewTree = that.insertReplacementSubtree(thisCrossoverNode, thatCrossoverPath)
 
     depthLimit match {
       case None    => List(thisNewTree, thatNewTree)
@@ -45,18 +45,28 @@ case class ProgramNode[T](
       "(" ++ evaluationFunction.toIdentifier ++ children.map(_.toSExpression).fold("")(_ ++ " " ++ _) ++ ")"
   }
 
-  lazy val allDescendants: IndexedSeq[ProgramNode[T]] = children.flatMap(_.allDescendants) :+ this
+  def allDescendants(): IndexedSeq[(ProgramNode[T], Queue[Int])] = {
+    allDescendantsAcc(Queue())
+  }
 
-  def chooseRandomDescendant(): ProgramNode[T] = allDescendants(rng.nextInt(allDescendants.length))
+  def chooseRandomDescendant(): (ProgramNode[T], Queue[Int]) = allDescendants()((new scala.util.Random).nextInt(allDescendants.length))
 
-  lazy val depth = allDescendants.map(_.pathFromRoot.length).max - pathFromRoot.length + 1
+  lazy val depth: Int = if (children.isEmpty)
+                          1
+                        else
+                          1 + children.map(_.depth).max
 
   protected
 
-  lazy val rng = new scala.util.Random
+  def allDescendantsAcc(queueToHere: Queue[Int]): IndexedSeq[(ProgramNode[T], Queue[Int])] = {
+    children.zipWithIndex.flatMap((childTuple) => childTuple._1.allDescendantsAcc(queueToHere :+ childTuple._2)) :+
+                                 (this, queueToHere)
+                         
+  }
+
 
   def insertReplacementSubtree(that: ProgramNode[T], position: Queue[Int]): ProgramNode[T] = {
-    val newSubtree = that.updatePathFromRoot(position)
+    val newSubtree = that
     if(position.isEmpty) {
       newSubtree
     } else {
@@ -69,11 +79,6 @@ case class ProgramNode[T](
       val replacedParent = parentToReplace.copy(children = leftChildren ++ Array(newSubtree) ++ rightChildren)
       insertReplacementSubtree(replacedParent, pathToParent)
     }
-  }
-
-  def updatePathFromRoot(newPathFromRoot: Queue[Int]): ProgramNode[T] = {
-    val newChildren = children.toIndexedSeq.zipWithIndex.map((nodeTuple) => nodeTuple._1.updatePathFromRoot(newPathFromRoot :+ nodeTuple._2))
-    copy(pathFromRoot = newPathFromRoot, children = newChildren) 
   }
 
   def followPath(path: Queue[Int]): ProgramNode[T] = path.foldLeft(this)((program, index) => program.children(index))

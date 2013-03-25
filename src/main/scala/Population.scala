@@ -65,6 +65,8 @@ object Population {
 
     while(!population.done) {
       beforeBreedingHook.foreach(_(population))
+      //println("\n\nPRESS ENTER TO CONTINUE")
+      //readLine()
       population = population.breedNewGeneration
     }
 
@@ -76,7 +78,10 @@ object Population {
     println("GENERATION " ++ population.generation.toString)
     println("BEST FITNESS OF CURRENT GENERATION: " ++ population.bestOfCurrentGeneration._2.toString)
     println("BEST FITNESS OF RUN: " ++ population.bestOfRun._2.toString)
-    println("")
+
+    //val nodeTotal = population.programs.map(_.allDescendants.length).sum
+    //println("TOTAL NODES: " ++ nodeTotal.toString)
+    println("CURRENT TIME: " ++ java.util.Calendar.getInstance.getTime.toString)
   }
 }
 
@@ -190,6 +195,9 @@ case class Population[ProgramType](
   def chooseProgramFitnessIndex(): Double = rng.nextDouble()
 
   def done = this.terminationConditions.exists(_(this))
+
+  // Default toString is so verbose that it can easily provoke an OOME
+  override def toString = "Population " + hashCode.toString + " " + "(generation " + generation.toString + ")"
 }
 
 abstract class ProgramFitnessFunction[InputType] extends Function1[InputType, Double] {

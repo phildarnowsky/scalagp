@@ -14,14 +14,16 @@ abstract case class ProgramGenerationStrategy[T] (
     (1 to arity).map(_ => if(nextLevelTerminal) chooseTerminalFunction.getNodeFunction else chooseNonterminalFunction.getNodeFunction)
   }
 
-  def generateChildren(arity: Int, pathFromRoot: Queue[Int]): IndexedSeq[ProgramNode[T]] = {
+  def generateChildren(arity: Int): IndexedSeq[ProgramNode[T]] = {
     val childFunctions = this.generateChildFunctions(arity)
 
     childFunctions.toIndexedSeq.zipWithIndex.map{
       (functionTuple) => new ProgramNode[T](
         functionTuple._1, 
         this.successor, 
-        pathFromRoot.enqueue(functionTuple._2))
+        Some(functionTuple._2)
+      )
+        //pathFromRoot.enqueue(functionTuple._2))
     }
   }
 
@@ -34,7 +36,7 @@ abstract case class ProgramGenerationStrategy[T] (
     new ProgramNode[T](
       evaluationFunction,
       this,
-      Queue()
+      None
     )
   }
 

@@ -155,32 +155,13 @@ class PopulationSpec extends Specification with SpecHelpers with Mockito {
 
       val population = spy(new Population[Int](List(program1, program2, program3, program4), TestProgramFitnessFunction, List(), None, 1.0, 0.0))
 
-      /* Rigging the choice of programs this way involves knowing more about
-         the workings of fitness-proportionate selection than I would like,
-         but I can't seem to properly stub chooseProgramForReproduction
-         itself, possibly because it's overloaded. */
+      population.chooseProgramForReproduction.returns(program1)
 
-      val program1Index = population.normalizedFitnesses(program1)
-      val program2Index = population.normalizedFitnesses(program2)
-      val program3Index = population.normalizedFitnesses(program3)
-      val epsilon = 0.00000000001
+      program1.crossoverWith(program1, None).returns(List(program3, program1))
 
-      population.chooseProgramForReproduction.returns(program1).
-                                              thenReturns(program1).
-                                              thenReturns(program3).
-                                              thenReturns(program1)
-/*      population.chooseProgramFitnessIndex().returns(program1Index - epsilon).*/
-                                                  //thenReturns(program1Index - epsilon).
-                                                  //thenReturns(program1Index + program2Index + epsilon).
-                                                  //thenReturns(program1Index - epsilon)
-     
-      //program1.crossoverWith(program1).returns(List(program3, program1))
-      //program3.crossoverWith(program1).returns(List(program2, program1))
-      pending
+      val newGeneration = population.breedNewGeneration
 
-/*      val newGeneration = population.breedNewGeneration*/
-
-      /*newGeneration.programs mustEqual List(program3, program1, program2, program1)*/
+      newGeneration.programs mustEqual List(program3, program1, program3, program1)
     }
 
     "create a new generation by reproduction chosen by fitness-proportionate selection" in {

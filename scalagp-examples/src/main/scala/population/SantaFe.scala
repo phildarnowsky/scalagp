@@ -12,7 +12,7 @@ object SantaFePopulation {
     Population.generateRampedHalfAndHalf(
       trancheSize,
       maximumDepth,
-      List(Prog2NodeFunction),
+      List(Prog2NodeFunction, Prog3NodeFunction, IfFoodAheadNodeFunction),
       List(MoveNodeFunction, RightNodeFunction, LeftNodeFunction),
       SantaFeFitnessFunction,
       List(Population.terminateOnFitness(0.0)),

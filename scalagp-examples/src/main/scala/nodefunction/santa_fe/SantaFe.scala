@@ -5,19 +5,19 @@ import com.darnowsky.scalagp.ProgramNode.ProgramNode
 
 class SantaFeWorld {
   def moveForward(): SantaFeWorld = {
-    throw new IllegalArgumentException("write me")
+    throw new UnsupportedOperationException("write me")
   }
 
   def turnRight(): SantaFeWorld = {
-    throw new IllegalArgumentException("write me")
+    throw new UnsupportedOperationException("write me")
   }
 
   def turnLeft(): SantaFeWorld = {
-    throw new IllegalArgumentException("write me")
+    throw new UnsupportedOperationException("write me")
   }
 
   def foodAhead(): Boolean = {
-    throw new IllegalArgumentException("write me")
+    throw new UnsupportedOperationException("write me")
   }
 }
 
@@ -56,6 +56,11 @@ class ProgN(childFunctions: Seq[SantaFeFunction]) extends SantaFeFunction {
 
 object Prog2NodeFunction extends NonterminalNodeFunction[SantaFeFunction](2) {
   def toIdentifier = "PROG2"
+  def apply(children: Seq[ProgramNode[SantaFeFunction]]) = new ProgN(children.map(_.evaluate))
+}
+
+object Prog3NodeFunction extends NonterminalNodeFunction[SantaFeFunction](3) {
+  def toIdentifier = "PROG3"
   def apply(children: Seq[ProgramNode[SantaFeFunction]]) = new ProgN(children.map(_.evaluate))
 }
 

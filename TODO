@@ -1,6 +1,5 @@
 MUST HAVE
 * Write README with some semblance of dox
-* Implement a few more examples out of Koza's book
 
 NICE TO HAVE
 * Overselection
@@ -14,6 +13,7 @@ NICE TO HAVE
 * Hooks for visualizers
 * Adapters for Hadoop/EMR
 * Save and load programs
+* Pretty-print program S-expressions
 
 CODE QUALITY
 * Change all those (Program, Fitness) tuples that litter the code into proper objects

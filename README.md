@@ -8,3 +8,23 @@ Genetic programming begins by making a large pool of random programs out of a sm
 scalagp implements a general infrastructure for this kind of problem, which allows you to concentrate on the more interesting question of modelling the domain-specific parts of the system.
 
 scalagp is currently in alpha. I've used it to solve some toy problems (see the scalagp-examples subproject), but there is also lots more I would like to add or polish (see the TODO file). Patches and constructive commentary are plenty welcome.
+
+Quickstart
+==========
+
+Suppose you wanted to find a way to construct the XOR function of inputs A and B, building it out of the OR, AND and NOT functions. We could think of a potential XOR function built this way as a tree with A or B in each leaf; and OR, AND, or NOT in each branch. So one tree made of these elements might look like:
+
+    AND ---- B
+    \
+     \
+      \
+       OR -- B
+        \
+         \
+          \
+           A
+
+which we could also write as an S-expression
+    (AND B (OR B A))
+
+

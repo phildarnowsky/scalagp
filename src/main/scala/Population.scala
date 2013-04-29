@@ -87,15 +87,27 @@ case class ReproductionParameters(
   val reproductionProportion: Double = 0.1
 )
 
-// TODO: this is getting to be a silly number of parameters, break some out
+case class PopulationHistory[ProgramType](
+  val generation: Int = 1,
+  val bestOfPreviousGenerations: Option[(ProgramNode[ProgramType], Double)] = None,
+  val previousGenerationsWithoutImprovement: Int = 0
+) {
+
+  def updateForNewGeneration(bestOfRun: (ProgramNode[ProgramType], Double), generationsWithoutImprovement: Int) = {
+    this.copy(
+      bestOfPreviousGenerations =             Some(bestOfRun),
+      previousGenerationsWithoutImprovement = generationsWithoutImprovement,
+      generation =                            this.generation + 1
+    )
+  }
+}
+
 case class Population[ProgramType](
   val programs: Seq[ProgramNode[ProgramType]], 
   val fitnessFunction: ProgramFitnessFunction[ProgramType],
   val terminationConditions: List[(Population[_] => Boolean)] = List(),
   val reproductionParameters: ReproductionParameters = new ReproductionParameters,
-  val generation: Int = 1,
-  val bestOfPreviousGenerations: Option[(ProgramNode[ProgramType], Double)] = None,
-  val previousGenerationsWithoutImprovement: Int = 0,
+  val history: PopulationHistory[ProgramType] = new PopulationHistory[ProgramType],
   val knownFitnesses: Map[ProgramNode[ProgramType], Double] = new HashMap[ProgramNode[ProgramType], Double]
 ) {
 
@@ -155,9 +167,7 @@ case class Population[ProgramType](
 
     this.copy(
       programs = (programsFromCrossover ++ programsFromReproduction),
-      bestOfPreviousGenerations = Some(this.bestOfRun),
-      generation = this.generation + 1,
-      previousGenerationsWithoutImprovement = generationsWithoutImprovement,
+      history = history.updateForNewGeneration(bestOfRun, generationsWithoutImprovement),
       knownFitnesses = newKnownFitnesses
     )
   }
@@ -205,6 +215,11 @@ case class Population[ProgramType](
   def depthLimit =             reproductionParameters.depthLimit
   def crossoverProportion =    reproductionParameters.crossoverProportion
   def reproductionProportion = reproductionParameters.reproductionProportion
+
+  // And delegate these values to history
+  def generation                            = history.generation
+  def bestOfPreviousGenerations             = history.bestOfPreviousGenerations
+  def previousGenerationsWithoutImprovement = history.previousGenerationsWithoutImprovement
 }
 
 abstract class ProgramFitnessFunction[InputType] extends Function1[InputType, Double] {

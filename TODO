@@ -18,4 +18,3 @@ CODE QUALITY
 * Change all those (Program, Fitness) tuples that litter the code into proper objects
 * Attempts to breed an odd number of programs by crossover should be handled gracefully
 * Do the tests rely too heavily on spying?
-* Turn the beforeBreedingHook argument to Population.run to a sequence

@@ -56,7 +56,7 @@ object Population {
     generate(trancheSize, strategies, fitnessFunction, terminationConditions, reproductionParameters)
   }
 
-  def run[ProgramType](initialPopulation: Population[ProgramType], beforeBreedingHook: Option[Population[_] => Unit] = None): Population[ProgramType] = {
+  def run[ProgramType](initialPopulation: Population[ProgramType], beforeBreedingHook: Traversable[Population[_] => Unit] = None): Population[ProgramType] = {
     var population = initialPopulation
 
     while(!population.done) {

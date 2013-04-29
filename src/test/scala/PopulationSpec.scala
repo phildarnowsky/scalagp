@@ -174,22 +174,7 @@ class PopulationSpec extends Specification with SpecHelpers with Mockito {
       val program4 = new ProgramNode(ConstantEvaluationFunction78910)
 
       val population = spy(new Population[Int](List(program1, program2, program3, program4), TestProgramFitnessFunction, List(), AlwaysReproduce))
-
-      /* Rigging the choice of programs this way involves knowing more about
-         the workings of fitness-proportionate selection than I would like,
-         but I can't seem to properly stub chooseProgramForReproduction
-         itself, possibly because it's overloaded. */
-         // TODO: That may no longer be so
-
-      val program1Index = population.normalizedFitnesses(program1)
-      val program2Index = population.normalizedFitnesses(program2)
-      val program3Index = population.normalizedFitnesses(program3)
-      val epsilon = 0.00000000001
-
-      population.chooseProgramFitnessIndex().returns(program1Index - epsilon).
-                                                  thenReturns(program1Index + program2Index - epsilon).
-                                                  thenReturns(program1Index + program2Index + epsilon).
-                                                  thenReturns(program1Index - epsilon)
+      population.chooseProgramForReproduction().returns(program1).thenReturns(program2).thenReturns(program3).thenReturns(program1)
 
       val newGeneration = population.breedNewGeneration
       newGeneration.programs mustEqual List(program1, program2, program3, program1)

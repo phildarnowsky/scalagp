@@ -25,8 +25,7 @@ object SantaFePopulation {
       List(Prog2NodeFunction, Prog3NodeFunction, IfFoodAheadNodeFunction),
       List(MoveNodeFunction, RightNodeFunction, LeftNodeFunction),
       new SantaFeFitnessFunction(SantaFeWorld.defaultTrail),
-      List(Population.terminateOnFitness(0.0)),
-      Some(15)
+      List(Population.terminateOnFitness(0.0))
     )
   }
 }

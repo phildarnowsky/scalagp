@@ -15,15 +15,13 @@ object Population {
     generationStrategies: Seq[ProgramGenerationStrategy[ProgramType]],
     evaluationFunction: ProgramFitnessFunction[ProgramType],
     terminationConditions: List[(Population[_] => Boolean)] = List(),
-    depthLimit: Option[Int] = None,
-    crossoverProportion: scala.Double = 0.9,
-    reproductionProportion: scala.Double = 0.1
+    reproductionParameters: ReproductionParameters = new ReproductionParameters
   ): Population[ProgramType] = {
 
     val programs = generationStrategies.flatMap(strategy =>
       (1 to trancheSize).map(_ => strategy.generateProgram))
 
-    new Population(programs, evaluationFunction, terminationConditions, depthLimit, crossoverProportion, reproductionProportion)
+    new Population(programs, evaluationFunction, terminationConditions, reproductionParameters)
   }
 
   def terminateOnFitness(maxFitness: Double): (Population[_] => Boolean) = {
@@ -47,9 +45,7 @@ object Population {
     terminals: Seq[TerminalNodeFunctionCreator[ProgramType]],
     fitnessFunction: ProgramFitnessFunction[ProgramType],
     terminationConditions: List[(Population[_] => Boolean)] = List(Population.terminateOnFitness(0.0)),
-    depthLimit: Option[Int] = None,
-    crossoverProportion: scala.Double = 0.9,
-    reproductionProportion: scala.Double = 0.1
+    reproductionParameters: ReproductionParameters = new ReproductionParameters
   ) = {
 
     val strategies = (1 to maximumDepth).flatMap((depth: Int) => List(
@@ -57,7 +53,7 @@ object Population {
       new GrowGenerationStrategy(nonterminals, terminals, depth)
     ))
 
-    generate(trancheSize, strategies, fitnessFunction, terminationConditions, depthLimit, crossoverProportion, reproductionProportion)
+    generate(trancheSize, strategies, fitnessFunction, terminationConditions, reproductionParameters)
   }
 
   def run[ProgramType](initialPopulation: Population[ProgramType], beforeBreedingHook: Option[Population[_] => Unit] = None): Population[ProgramType] = {
@@ -85,14 +81,18 @@ object Population {
   }
 }
 
+case class ReproductionParameters(
+  val depthLimit: Option[Int] = Some(15),
+  val crossoverProportion: Double = 0.9,
+  val reproductionProportion: Double = 0.1
+)
+
 // TODO: this is getting to be a silly number of parameters, break some out
 case class Population[ProgramType](
   val programs: Seq[ProgramNode[ProgramType]], 
   val fitnessFunction: ProgramFitnessFunction[ProgramType],
   val terminationConditions: List[(Population[_] => Boolean)] = List(),
-  val depthLimit: Option[Int] = None,
-  val crossoverProportion: Double = 0.9,
-  val reproductionProportion: Double = 0.1,
+  val reproductionParameters: ReproductionParameters = new ReproductionParameters,
   val generation: Int = 1,
   val bestOfPreviousGenerations: Option[(ProgramNode[ProgramType], Double)] = None,
   val previousGenerationsWithoutImprovement: Int = 0,
@@ -198,6 +198,13 @@ case class Population[ProgramType](
 
   // Default toString is so verbose that it can easily provoke an OOME
   override def toString = "Population " + hashCode.toString + " " + "(generation " + generation.toString + ")"
+
+  protected
+
+  // Delegate these values to reproductionParameters
+  def depthLimit =             reproductionParameters.depthLimit
+  def crossoverProportion =    reproductionParameters.crossoverProportion
+  def reproductionProportion = reproductionParameters.reproductionProportion
 }
 
 abstract class ProgramFitnessFunction[InputType] extends Function1[InputType, Double] {

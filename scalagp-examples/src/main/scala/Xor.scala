@@ -76,8 +76,7 @@ object XorPopulation {
       List(OrNodeFunction, AndNodeFunction, NotNodeFunction),
       List(ANodeFunction, BNodeFunction),
       XorFitnessFunction,
-      List(Population.terminateOnFitness(0.0)),
-      Some(15)
+      List(Population.terminateOnFitness(0.0))
     )
   }
 }

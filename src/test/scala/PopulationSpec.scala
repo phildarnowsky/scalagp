@@ -14,6 +14,9 @@ class PopulationSpec extends Specification with SpecHelpers with Mockito {
     def apply(programOutput: Int): Double = programOutput * 3.0
   }
 
+  object AlwaysReproduce extends ReproductionParameters(None, 0.0, 1.0)
+  object AlwaysCrossover extends ReproductionParameters(None, 1.0, 0.0)
+
   "The Population companion object" should {
     "be able to generate a Population via even splits" in {
       val fullStrategy = spy(new FullGenerationStrategy[Int](List(HeadEvaluationFunction, LastEvaluationFunction), List(ConstantEvaluationFunction42, ConstantEvaluationFunction666), 5))
@@ -37,7 +40,7 @@ class PopulationSpec extends Specification with SpecHelpers with Mockito {
       val mediocreProgram = spy(new ProgramNode(ConstantEvaluationFunction1337))
       val goodProgram = spy(new ProgramNode(ConstantEvaluationFunction42))
 
-      val population = new Population[Int](List.fill(100)(badProgram), TestProgramFitnessFunction, List(Population.terminateOnFitness(4010.0))) // just below fitness of mediocreProgram
+      val population = new Population[Int](List.fill(100)(badProgram), TestProgramFitnessFunction, List(Population.terminateOnFitness(4010.0)), AlwaysCrossover) // just below fitness of mediocreProgram
 
       badProgram.crossoverWith(badProgram).returns(List.fill(2)(mediocreProgram))
       mediocreProgram.crossoverWith(mediocreProgram).returns(List.fill(2)(goodProgram))
@@ -47,11 +50,11 @@ class PopulationSpec extends Specification with SpecHelpers with Mockito {
       result.generation mustEqual 3
     }
 
-    "terminate on fitness plateauing for too long" in {
+   "terminate on fitness plateauing for too long" in {
       val badProgram = spy(new ProgramNode(ConstantEvaluationFunction78910))
       val mediocreProgram = spy(new ProgramNode(ConstantEvaluationFunction1337))
 
-      val population = new Population[Int](List.fill(100)(badProgram), TestProgramFitnessFunction, List(Population.terminateOnFitnessPlateau(5)))
+      val population = new Population[Int](List.fill(100)(badProgram), TestProgramFitnessFunction, List(Population.terminateOnFitnessPlateau(5)), AlwaysCrossover)
 
       badProgram.crossoverWith(badProgram).returns(List.fill(2)(mediocreProgram))
       mediocreProgram.crossoverWith(mediocreProgram).returns(List.fill(2)(mediocreProgram))
@@ -69,7 +72,7 @@ class PopulationSpec extends Specification with SpecHelpers with Mockito {
       class HookTarget {
         def someMethod(): Unit = {
         }
-      }
+     }
 
       val testTarget = spy(new HookTarget)
       val pokeHookTarget = ((pop: Population[_]) => testTarget.someMethod)
@@ -153,7 +156,7 @@ class PopulationSpec extends Specification with SpecHelpers with Mockito {
       val program3 = spy(new ProgramNode(ConstantEvaluationFunction3456))
       val program4 = spy(new ProgramNode(ConstantEvaluationFunction78910))
 
-      val population = spy(new Population[Int](List(program1, program2, program3, program4), TestProgramFitnessFunction, List(), None, 1.0, 0.0))
+      val population = spy(new Population[Int](List(program1, program2, program3, program4), TestProgramFitnessFunction, List(), AlwaysCrossover))
 
       population.chooseProgramForReproduction.returns(program1)
 
@@ -170,12 +173,13 @@ class PopulationSpec extends Specification with SpecHelpers with Mockito {
       val program3 = new ProgramNode(ConstantEvaluationFunction3456)
       val program4 = new ProgramNode(ConstantEvaluationFunction78910)
 
-      val population = spy(new Population[Int](List(program1, program2, program3, program4), TestProgramFitnessFunction, List(), None, 0.0, 1.0))
+      val population = spy(new Population[Int](List(program1, program2, program3, program4), TestProgramFitnessFunction, List(), AlwaysReproduce))
 
       /* Rigging the choice of programs this way involves knowing more about
          the workings of fitness-proportionate selection than I would like,
          but I can't seem to properly stub chooseProgramForReproduction
          itself, possibly because it's overloaded. */
+         // TODO: That may no longer be so
 
       val program1Index = population.normalizedFitnesses(program1)
       val program2Index = population.normalizedFitnesses(program2)
@@ -196,7 +200,7 @@ class PopulationSpec extends Specification with SpecHelpers with Mockito {
     "breed the correct proportions by crossover and reproduction" in {
       val program = spy(new ProgramNode(ConstantEvaluationFunction42))
       val programs = List.fill(100)(program)
-      val population = spy(new Population[Int](programs, TestProgramFitnessFunction, List(), None, 0.7, 0.3))
+      val population = spy(new Population[Int](programs, TestProgramFitnessFunction, List(), new ReproductionParameters(None, 0.7, 0.3)))
 
       val nextGeneration = population.breedNewGeneration
 
@@ -212,7 +216,7 @@ class PopulationSpec extends Specification with SpecHelpers with Mockito {
       val badProgram = spy(new ProgramNode(ConstantEvaluationFunction3456))
       val worseProgram = spy(new ProgramNode(ConstantEvaluationFunction78910))
 
-      val population = spy(new Population[Int](List(goodProgram, badProgram), TestProgramFitnessFunction, List(), None, 1.0, 0.0))
+      val population = spy(new Population[Int](List(goodProgram, badProgram), TestProgramFitnessFunction, List(), AlwaysCrossover))
 
       population.bestOfPreviousGenerations mustEqual None
       population.bestOfRun mustEqual (goodProgram, 1337.0 * 3)

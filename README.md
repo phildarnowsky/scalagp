@@ -7,7 +7,7 @@ Genetic programming begins by making a large pool of random programs out of a sm
 
 scalagp implements a general infrastructure for this kind of problem, which allows you to concentrate on the more interesting question of modelling the domain-specific parts of the system.
 
-scalagp is currently in alpha. I've used it to solve some toy problems (see the scalagp-examples subproject), but there is also lots more I would like to add or polish (see the TODO file). Patches and constructive commentary are plenty welcome.
+scalagp is currently in alpha. I've used it to solve some toy problems (see the scalagp-examples subproject), but there is also lots more I would like to add or polish (see the TODO file). Patches and constructive commentary are plenty welcome. It is also a safe bet that the API and internals will both change frequently for a while.
 
 Quickstart
 ==========

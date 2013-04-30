@@ -85,7 +85,7 @@ class PopulationSpec extends Specification with SpecHelpers with Mockito {
   }
 
   "A Population" should {
-    "evaluate its constituent programs for fitness, adjusted fitness, and normalized fitness" in {
+    "evaluate its constituent programs for fitness" in {
       val commonChildren = Array(
         new ProgramNode(ConstantEvaluationFunction42, Array():Array[ProgramNode[Int]], Some(0)),
         new ProgramNode(ConstantEvaluationFunction666, Array():Array[ProgramNode[Int]], Some(1))
@@ -102,69 +102,20 @@ class PopulationSpec extends Specification with SpecHelpers with Mockito {
       fitnessResult.size mustEqual 2
       fitnessResult(testProgram1) mustEqual 126.0
       fitnessResult(testProgram2) mustEqual 1998.0
-
-      // adjusted fitness maps fitnesses to [0.0, 1.0] and also exaggerates
-      // small differences in fitness, which is generally a win
-
-      val adjustedFitnessResult = population.adjustedFitnesses
-      adjustedFitnessResult.size mustEqual 2
-      adjustedFitnessResult(testProgram1) mustEqual 0.007874015748031496 // 1.0 / (1.0 + fitness)
-      adjustedFitnessResult(testProgram2) mustEqual 5.002501250625312E-4
-
-      // normalized fitness normalized adjusted fitnesses so they sum to 1.0
-
-      val normalizedFitnessResult = population.normalizedFitnesses
-      normalizedFitnessResult.size mustEqual 2
-      normalizedFitnessResult(testProgram1) mustEqual 0.940263405456256
-      normalizedFitnessResult(testProgram2) mustEqual 0.05973659454374412
-    }
-
-    "pick a program for reproduction proportionate to its fitness" in {
-      val program1 = new ProgramNode(ConstantEvaluationFunction42)
-      val program2 = new ProgramNode(ConstantEvaluationFunction1337)
-      val program3 = new ProgramNode(ConstantEvaluationFunction3456)
-
-      /* see notes in previous test regarding standardized vs. adjusted vs.
-         normalized fitness */
-
-      val epsilon = 0.00000000001
-
-      val population = spy(new Population[Int](List(program1, program2, program3), TestProgramFitnessFunction))
-
-      val program1Cutoff = population.normalizedFitnesses(program1)
-      val program2Cutoff = population.normalizedFitnesses(program2)
-      val program3Cutoff = population.normalizedFitnesses(program3)
-
-      population.chooseProgramFitnessIndex().returns(0.0).
-                                                  thenReturns(program1Cutoff - epsilon).
-                                                  thenReturns(program1Cutoff + epsilon).
-                                                  thenReturns(program1Cutoff + program2Cutoff - epsilon).
-                                                  thenReturns(program1Cutoff + program2Cutoff + epsilon).
-                                                  thenReturns(program1Cutoff + program2Cutoff + program3Cutoff - epsilon)
-
-      population.chooseProgramForReproduction mustEqual program1
-      population.chooseProgramForReproduction mustEqual program1
-      population.chooseProgramForReproduction mustEqual program2
-      population.chooseProgramForReproduction mustEqual program2
-      population.chooseProgramForReproduction mustEqual program3
-      population.chooseProgramForReproduction mustEqual program3
     }
 
     "create a new generation by crossover with parents chosen by fitness-proportionate selection" in {
       val program1 = spy(new ProgramNode(ConstantEvaluationFunction42))
       val program2 = spy(new ProgramNode(ConstantEvaluationFunction1337))
       val program3 = spy(new ProgramNode(ConstantEvaluationFunction3456))
-      val program4 = spy(new ProgramNode(ConstantEvaluationFunction78910))
 
-      val population = spy(new Population[Int](List(program1, program2, program3, program4), TestProgramFitnessFunction, List(), AlwaysCrossover))
+      val population = spy(new Population[Int](List(program1, program1, program1, program1), TestProgramFitnessFunction, List(), AlwaysCrossover))
 
-      population.chooseProgramForReproduction.returns(program1)
-
-      program1.crossoverWith(program1, None).returns(List(program3, program1))
+      program1.crossoverWith(program1, None).returns(List(program3, program2))
 
       val newGeneration = population.breedNewGeneration
 
-      newGeneration.programs mustEqual List(program3, program1, program3, program1)
+      newGeneration.programs mustEqual List(program3, program2, program3, program2)
     }
 
     "create a new generation by reproduction chosen by fitness-proportionate selection" in {
@@ -174,7 +125,7 @@ class PopulationSpec extends Specification with SpecHelpers with Mockito {
       val program4 = new ProgramNode(ConstantEvaluationFunction78910)
 
       val population = spy(new Population[Int](List(program1, program2, program3, program4), TestProgramFitnessFunction, List(), AlwaysReproduce))
-      population.chooseProgramForReproduction().returns(program1).thenReturns(program2).thenReturns(program3).thenReturns(program1)
+      population.chooseProgramForReproduction.returns(program1).thenReturns(program2).thenReturns(program3).thenReturns(program1)
 
       val newGeneration = population.breedNewGeneration
       newGeneration.programs mustEqual List(program1, program2, program3, program1)
@@ -206,15 +157,14 @@ class PopulationSpec extends Specification with SpecHelpers with Mockito {
       population.bestOfPreviousGenerations mustEqual None
       population.bestOfRun mustEqual (goodProgram, 1337.0 * 3)
 
-      // same stupid trick as above to get goodProgram twice
-      population.chooseProgramFitnessIndex().returns(0.0).thenReturns(0.0)
+      population.chooseProgramForReproduction.returns(goodProgram).thenReturns(goodProgram)
       goodProgram.crossoverWith(goodProgram).returns(List(badProgram, worseProgram))
 
       val secondGeneration = spy(population.breedNewGeneration)
       secondGeneration.bestOfPreviousGenerations mustEqual Some((goodProgram, 1337.0 * 3))
       secondGeneration.bestOfRun mustEqual (goodProgram, 1337.0 * 3)
 
-      secondGeneration.chooseProgramFitnessIndex().returns(0.0).thenReturns(0.0)
+      secondGeneration.chooseProgramForReproduction.returns(badProgram).thenReturns(badProgram)
       badProgram.crossoverWith(badProgram).returns(List(badProgram, bestProgram))
       
       val thirdGeneration = secondGeneration.breedNewGeneration

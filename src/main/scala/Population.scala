@@ -5,6 +5,8 @@ import com.darnowsky.scalagp.FullGenerationStrategy.FullGenerationStrategy
 import com.darnowsky.scalagp.GrowGenerationStrategy.GrowGenerationStrategy
 import com.darnowsky.scalagp.ProgramNode.ProgramNode
 import com.darnowsky.scalagp.NodeFunction.{NonterminalNodeFunctionCreator, TerminalNodeFunctionCreator}
+import com.darnowsky.scalagp.ReproductionChoiceStrategy.ReproductionChoiceStrategy
+import com.darnowsky.scalagp.UniformReproductionChoiceStrategy.UniformReproductionChoiceStrategy
 
 import scala.collection.immutable.HashMap
 import scala.annotation.tailrec
@@ -107,6 +109,7 @@ case class Population[ProgramType](
   val fitnessFunction: ProgramFitnessFunction[ProgramType],
   val terminationConditions: List[(Population[_] => Boolean)] = List(),
   val reproductionParameters: ReproductionParameters = new ReproductionParameters,
+  val reproductionChoiceStrategyGenerator: (Map[ProgramNode[ProgramType], Double] => ReproductionChoiceStrategy[ProgramType]) = ((fitnesses: Map[ProgramNode[ProgramType], Double]) => new UniformReproductionChoiceStrategy(fitnesses)),
   val history: PopulationHistory[ProgramType] = new PopulationHistory[ProgramType],
   val knownFitnesses: Map[ProgramNode[ProgramType], Double] = new HashMap[ProgramNode[ProgramType], Double]
 ) {
@@ -114,15 +117,6 @@ case class Population[ProgramType](
   lazy val fitnesses = {
     programs.foldLeft(knownFitnesses)((map, program) => map + (program -> fitnessFunction(program.evaluate)))
   }
-
-  lazy val adjustedFitnesses = fitnesses.mapValues((fitness) => 1.0 / (1.0 + fitness))
-
-  lazy val normalizedFitnesses = {
-    val fitnessSum = adjustedFitnesses.values.sum
-    adjustedFitnesses.mapValues(_ / fitnessSum)
-  }
-
-  lazy val normalizedFitnessesInDescendingFitnessOrder = normalizedFitnesses.toList.sortBy(_._2).reverse
 
   lazy val bestOfCurrentGeneration = fitnesses.toList.sortBy(_._2).head
 
@@ -132,32 +126,7 @@ case class Population[ProgramType](
                          case Some(oldBest) => List(oldBest, bestOfCurrentGeneration).sortBy(_._2).head
                        }
 
-  val rng = new scala.util.Random
-
-  /* Someday, possibly someday soon, we'll have overselection and elitism and
-     rank selection and tournament selection and all sorts of fancy selection
-     algorithms. When that happens we'll worry about making this more generic.
-     Probably use another hierarchy of strategy classes.
-  
-     But for now, we're just doing good old fitness-proportionate selection,
-     just like mother used to make. */
-
-  def chooseProgramForReproduction(): ProgramNode[ProgramType] = {
-    @tailrec
-    def chooseProgramForReproductionAcc(index: Double, programsInDescendingFitness: List[(ProgramNode[ProgramType], Double)]): ProgramNode[ProgramType] = {
-      val(firstProgram, firstProgramFitness) = programsInDescendingFitness.head
-      
-      if(index <= firstProgramFitness || programsInDescendingFitness.tail.isEmpty) // the second clause is a little hack to deal with imprecision of double arithmetic
-        firstProgram
-      else
-        chooseProgramForReproductionAcc(index - firstProgramFitness, programsInDescendingFitness.tail)
-    }
-
-    chooseProgramForReproductionAcc(
-      chooseProgramFitnessIndex(),
-      normalizedFitnessesInDescendingFitnessOrder
-    )
-  }
+  lazy val reproductionChoiceStrategy = reproductionChoiceStrategyGenerator(fitnesses)
 
   def breedNewGeneration: Population[ProgramType] = {
     val programsFromCrossover = breedByCrossover
@@ -188,7 +157,7 @@ case class Population[ProgramType](
 
   def breedByCrossover(): Seq[ProgramNode[ProgramType]] = {
     val crossoverCount = (programs.length * crossoverProportion).toInt
-    val breeders = List.fill(crossoverCount)(chooseProgramForReproduction())
+    val breeders = List.fill(crossoverCount)(chooseProgramForReproduction)
     val breedingPairs = breeders.grouped(2)
 
     breedingPairs.flatMap((pair) => pair(0).crossoverWith(pair(1), depthLimit)).toList
@@ -197,12 +166,10 @@ case class Population[ProgramType](
   def breedByReproduction(): Seq[(ProgramNode[ProgramType], Double)] = {
     val reproductionCount = (programs.length * reproductionProportion).toInt
     List.fill(reproductionCount){
-      val chosenProgram = chooseProgramForReproduction()
+      val chosenProgram = chooseProgramForReproduction
       (chosenProgram, fitnesses(chosenProgram))
     }
   }
-
-  def chooseProgramFitnessIndex(): Double = rng.nextDouble()
 
   def done = this.terminationConditions.exists(_(this))
 
@@ -212,14 +179,17 @@ case class Population[ProgramType](
   protected
 
   // Delegate these values to reproductionParameters
-  def depthLimit =             reproductionParameters.depthLimit
-  def crossoverProportion =    reproductionParameters.crossoverProportion
+  def depthLimit             = reproductionParameters.depthLimit
+  def crossoverProportion    = reproductionParameters.crossoverProportion
   def reproductionProportion = reproductionParameters.reproductionProportion
 
   // And delegate these values to history
   def generation                            = history.generation
   def bestOfPreviousGenerations             = history.bestOfPreviousGenerations
   def previousGenerationsWithoutImprovement = history.previousGenerationsWithoutImprovement
+
+  // And this to reproductionChoiceStrategy
+  def chooseProgramForReproduction = reproductionChoiceStrategy.chooseProgramForReproduction
 }
 
 abstract class ProgramFitnessFunction[InputType] extends Function1[InputType, Double] {

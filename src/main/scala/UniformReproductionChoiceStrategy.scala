@@ -27,7 +27,9 @@ class UniformReproductionChoiceStrategy[ProgramType](fitnesses: Map[ProgramNode[
     )
   }  
   
-  lazy val adjustedFitnesses = fitnesses.mapValues((fitness) => 1.0 / (1.0 + fitness))
+  lazy val adjustedFitnesses = {
+    fitnesses.mapValues((fitness) => 1.0 / (1.0 + fitness))
+  }
 
   lazy val normalizedFitnesses = {
     val fitnessSum = adjustedFitnesses.values.sum

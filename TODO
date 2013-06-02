@@ -1,7 +1,6 @@
 MUST HAVE
 
 NICE TO HAVE
-* Overselection
 * Bias node selection in crossover by terminal/nonterminal status (i.e. node selection is 90% likely to choose an internal node)
 * Elite reproduction
 * Tournament selection

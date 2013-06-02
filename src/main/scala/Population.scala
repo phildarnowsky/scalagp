@@ -114,7 +114,7 @@ case class Population[ProgramType](
   val knownFitnesses: Map[ProgramNode[ProgramType], Double] = new HashMap[ProgramNode[ProgramType], Double]
 ) {
 
-  lazy val fitnesses = {
+  val fitnesses = {
     programs.foldLeft(knownFitnesses)((map, program) => map + (program -> fitnessFunction(program.evaluate)))
   }
 

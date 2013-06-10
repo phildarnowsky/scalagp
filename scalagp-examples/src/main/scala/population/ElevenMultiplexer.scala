@@ -2,6 +2,7 @@ package com.darnowsky.scalagp_examples.population.ElevenMultiplexer
 
 import com.darnowsky.scalagp.Population._
 import com.darnowsky.scalagp_examples.nodefunction.booleanfunction.ElevenMultiplexer._
+import com.darnowsky.scalagp.OverselectingReproductionChoiceStrategy._
 
 class ElevenMultiplexerFitnessCase(caseIndex: Int) {
   val bits = Vector(1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024).map{(mask: Int) => (caseIndex & mask) > 0}
@@ -28,7 +29,9 @@ object ElevenMultiplexerPopulation {
       List(AndNodeFunction, OrNodeFunction, NotNodeFunction, IfNodeFunction),
       List(Address0NodeFunction, Address1NodeFunction, Address2NodeFunction, Data0NodeFunction, Data1NodeFunction, Data2NodeFunction, Data3NodeFunction, Data4NodeFunction, Data5NodeFunction, Data6NodeFunction, Data7NodeFunction),
       ElevenMultiplexerFitnessFunction,
-      List(Population.terminateOnFitness(0.0))
+      List(Population.terminateOnFitness(0.0)),
+      new ReproductionParameters,
+      OverselectingReproductionChoiceStrategy
     )
   }
 }

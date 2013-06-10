@@ -1,10 +1,14 @@
 package com.darnowsky.scalagp.OverselectingReproductionChoiceStrategy
 
-import com.darnowsky.scalagp.ReproductionChoiceStrategy.ReproductionChoiceStrategy
+import com.darnowsky.scalagp.ReproductionChoiceStrategy.{ReproductionChoiceStrategy, ReproductionChoiceStrategyGenerator}
 import com.darnowsky.scalagp.UniformReproductionChoiceStrategy.UniformReproductionChoiceStrategy
 import com.darnowsky.scalagp.ProgramNode.ProgramNode
 
 import scala.collection.immutable.HashMap
+
+object OverselectingReproductionChoiceStrategy extends ReproductionChoiceStrategyGenerator {
+  def apply[ProgramType](fitnesses: Map[ProgramNode[ProgramType], Double]): OverselectingReproductionChoiceStrategy[ProgramType] = new OverselectingReproductionChoiceStrategy(fitnesses)
+}
 
 class OverselectingReproductionChoiceStrategy[ProgramType](fitnesses: Map[ProgramNode[ProgramType], Double], eliteProportion: Double = 0.32, eliteLikelihood: Double = 0.8) extends ReproductionChoiceStrategy[ProgramType](fitnesses) { 
   val rng = new scala.util.Random

@@ -17,13 +17,14 @@ object Population {
     generationStrategies: Seq[ProgramGenerationStrategy[ProgramType]],
     evaluationFunction: ProgramFitnessFunction[ProgramType],
     terminationConditions: List[(Population[_] => Boolean)] = List(),
-    reproductionParameters: ReproductionParameters = new ReproductionParameters
+    reproductionParameters: ReproductionParameters = new ReproductionParameters,
+    reproductionChoiceStrategyGenerator: ReproductionChoiceStrategyGenerator = UniformReproductionChoiceStrategy
   ): Population[ProgramType] = {
 
     val programs = generationStrategies.flatMap(strategy =>
       (1 to trancheSize).map(_ => strategy.generateProgram))
 
-    new Population(programs, evaluationFunction, terminationConditions, reproductionParameters)
+    new Population(programs, evaluationFunction, terminationConditions, reproductionParameters, reproductionChoiceStrategyGenerator)
   }
 
   def terminateOnFitness(maxFitness: Double): (Population[_] => Boolean) = {
@@ -47,7 +48,8 @@ object Population {
     terminals: Seq[TerminalNodeFunctionCreator[ProgramType]],
     fitnessFunction: ProgramFitnessFunction[ProgramType],
     terminationConditions: List[(Population[_] => Boolean)] = List(Population.terminateOnFitness(0.0)),
-    reproductionParameters: ReproductionParameters = new ReproductionParameters
+    reproductionParameters: ReproductionParameters = new ReproductionParameters,
+    reproductionChoiceStrategyGenerator: ReproductionChoiceStrategyGenerator = UniformReproductionChoiceStrategy
   ) = {
 
     val strategies = (1 to maximumDepth).flatMap((depth: Int) => List(
@@ -55,7 +57,7 @@ object Population {
       new GrowGenerationStrategy(nonterminals, terminals, depth)
     ))
 
-    generate(trancheSize, strategies, fitnessFunction, terminationConditions, reproductionParameters)
+    generate(trancheSize, strategies, fitnessFunction, terminationConditions, reproductionParameters, reproductionChoiceStrategyGenerator)
   }
 
   def run[ProgramType](initialPopulation: Population[ProgramType], beforeBreedingHook: Traversable[Population[_] => Unit] = None): Population[ProgramType] = {

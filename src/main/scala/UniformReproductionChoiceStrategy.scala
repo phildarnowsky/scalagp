@@ -2,8 +2,12 @@ package com.darnowsky.scalagp.UniformReproductionChoiceStrategy
 
 import scala.annotation.tailrec
 
-import com.darnowsky.scalagp.ReproductionChoiceStrategy.ReproductionChoiceStrategy
+import com.darnowsky.scalagp.ReproductionChoiceStrategy.{ReproductionChoiceStrategy, ReproductionChoiceStrategyGenerator}
 import com.darnowsky.scalagp.ProgramNode.ProgramNode
+
+object UniformReproductionChoiceStrategy extends ReproductionChoiceStrategyGenerator {
+  def apply[ProgramType](fitnesses: Map[ProgramNode[ProgramType], Double]): UniformReproductionChoiceStrategy[ProgramType] = new UniformReproductionChoiceStrategy(fitnesses)
+}
 
 class UniformReproductionChoiceStrategy[ProgramType](fitnesses: Map[ProgramNode[ProgramType], Double]) extends ReproductionChoiceStrategy[ProgramType](fitnesses) {
   val rng = new scala.util.Random

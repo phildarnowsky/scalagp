@@ -5,7 +5,7 @@ import com.darnowsky.scalagp.FullGenerationStrategy.FullGenerationStrategy
 import com.darnowsky.scalagp.GrowGenerationStrategy.GrowGenerationStrategy
 import com.darnowsky.scalagp.ProgramNode.ProgramNode
 import com.darnowsky.scalagp.NodeFunction.{NonterminalNodeFunctionCreator, TerminalNodeFunctionCreator}
-import com.darnowsky.scalagp.ReproductionChoiceStrategy.ReproductionChoiceStrategy
+import com.darnowsky.scalagp.ReproductionChoiceStrategy.{ReproductionChoiceStrategy, ReproductionChoiceStrategyGenerator}
 import com.darnowsky.scalagp.UniformReproductionChoiceStrategy.UniformReproductionChoiceStrategy
 
 import scala.collection.immutable.HashMap
@@ -109,7 +109,7 @@ case class Population[ProgramType](
   val fitnessFunction: ProgramFitnessFunction[ProgramType],
   val terminationConditions: List[(Population[_] => Boolean)] = List(),
   val reproductionParameters: ReproductionParameters = new ReproductionParameters,
-  val reproductionChoiceStrategyGenerator: (Map[ProgramNode[ProgramType], Double] => ReproductionChoiceStrategy[ProgramType]) = ((fitnesses: Map[ProgramNode[ProgramType], Double]) => new UniformReproductionChoiceStrategy(fitnesses)),
+  val reproductionChoiceStrategyGenerator: ReproductionChoiceStrategyGenerator = UniformReproductionChoiceStrategy,
   val history: PopulationHistory[ProgramType] = new PopulationHistory[ProgramType],
   val knownFitnesses: Map[ProgramNode[ProgramType], Double] = new HashMap[ProgramNode[ProgramType], Double]
 ) {

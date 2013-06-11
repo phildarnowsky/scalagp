@@ -20,8 +20,7 @@ abstract case class ProgramGenerationStrategy[T] (
     childFunctions.toIndexedSeq.zipWithIndex.map{
       (functionTuple) => new ProgramNode[T](
         functionTuple._1, 
-        this.successor, 
-        Some(functionTuple._2)
+        this.successor
       )
         //pathFromRoot.enqueue(functionTuple._2))
     }
@@ -35,8 +34,7 @@ abstract case class ProgramGenerationStrategy[T] (
 
     new ProgramNode[T](
       evaluationFunction,
-      this,
-      None
+      this
     )
   }
 

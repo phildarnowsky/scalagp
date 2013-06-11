@@ -87,12 +87,12 @@ class PopulationSpec extends Specification with SpecHelpers with Mockito {
   "A Population" should {
     "evaluate its constituent programs for fitness" in {
       val commonChildren = Array(
-        new ProgramNode(ConstantEvaluationFunction42, Array():Array[ProgramNode[Int]], Some(0)),
-        new ProgramNode(ConstantEvaluationFunction666, Array():Array[ProgramNode[Int]], Some(1))
+        new ProgramNode(ConstantEvaluationFunction42, Array():Array[ProgramNode[Int]]),
+        new ProgramNode(ConstantEvaluationFunction666, Array():Array[ProgramNode[Int]])
       )
 
-      val testProgram1 = new ProgramNode(HeadEvaluationFunction, commonChildren, None)
-      val testProgram2 = new ProgramNode(LastEvaluationFunction, commonChildren, None)
+      val testProgram1 = new ProgramNode(HeadEvaluationFunction, commonChildren)
+      val testProgram2 = new ProgramNode(LastEvaluationFunction, commonChildren)
       val population = new Population(List(testProgram1, testProgram2), TestProgramFitnessFunction)
 
       // population.fitnesses holds what Koza calls "standardized fitness"

@@ -17,8 +17,7 @@ class ProgramNodeSpec extends Specification with Mockito with SpecHelpers {
       Array(
         new ProgramNode[Int](
           ConstantEvaluationFunction42,
-          Array():Array[ProgramNode[Int]],
-          Some(0)
+          Array():Array[ProgramNode[Int]]
         ),
 
         new ProgramNode[Int](
@@ -26,14 +25,11 @@ class ProgramNodeSpec extends Specification with Mockito with SpecHelpers {
           Array(
             new ProgramNode[Int](
               ConstantEvaluationFunction666,
-              Array():Array[ProgramNode[Int]],
-              Some(0)
+              Array():Array[ProgramNode[Int]]
             )
-          ),
-          Some(1)
+          )
         )
-      ),
-      None
+      )
     )
 
     val program2 = new ProgramNode[Int](
@@ -49,12 +45,10 @@ class ProgramNodeSpec extends Specification with Mockito with SpecHelpers {
 
                 new ProgramNode[Int](
                   ConstantEvaluationFunction1337,
-                  Array():Array[ProgramNode[Int]],
-                  Some(0)
+                  Array():Array[ProgramNode[Int]]
                 )
 
-              ),
-              Some(0)
+              )
             ),
 
             new ProgramNode[Int](
@@ -62,23 +56,18 @@ class ProgramNodeSpec extends Specification with Mockito with SpecHelpers {
               Array(
                 new ProgramNode[Int](
                   ConstantEvaluationFunction3456,
-                  Array():Array[ProgramNode[Int]],
-                  Some(0)
+                  Array():Array[ProgramNode[Int]]
                 ),
 
                 new ProgramNode[Int](
                   ConstantEvaluationFunction78910,
-                  Array():Array[ProgramNode[Int]],
-                  Some(1)
+                  Array():Array[ProgramNode[Int]]
                 )
-              ),
-              Some(1)
+              )
             )
-          ),
-          Some(0)
+          )
         )
-      ),
-      None
+      )
     )
 
     // program1 is (+ 42 (- 666))
@@ -140,8 +129,8 @@ class ProgramNodeSpec extends Specification with Mockito with SpecHelpers {
     }
 
     "be able to evaluate itself as a function of its children" in {
-      val leftChild = new ProgramNode[Int](ConstantEvaluationFunction42, Array():Array[ProgramNode[Int]], Some(0))
-      val rightChild = new ProgramNode[Int](ConstantEvaluationFunction666, Array():Array[ProgramNode[Int]], Some(1))
+      val leftChild = new ProgramNode[Int](ConstantEvaluationFunction42, Array():Array[ProgramNode[Int]])
+      val rightChild = new ProgramNode[Int](ConstantEvaluationFunction666, Array():Array[ProgramNode[Int]])
       val topNode = new ProgramNode[Int](AddEvaluationFunction, Array(leftChild, rightChild))
       topNode.evaluate mustEqual (42 + 666)
     }
@@ -156,8 +145,7 @@ class ProgramNodeSpec extends Specification with Mockito with SpecHelpers {
 
     val topNode = new ProgramNode[Int](
       AddEvaluationFunction,
-      new FakeProgramGenerationStrategy(3),
-      None
+      new FakeProgramGenerationStrategy(3)
     )
 
 

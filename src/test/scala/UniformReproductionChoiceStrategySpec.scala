@@ -16,12 +16,12 @@ class UniformReproductionChoiceStrategySpec extends Specification with SpecHelpe
       // normalized fitness normalizes adjusted fitnesses so they sum to 1.0
 
       val commonChildren = Array(
-        new ProgramNode(ConstantEvaluationFunction42, Array():Array[ProgramNode[Int]], Some(0)),
-        new ProgramNode(ConstantEvaluationFunction666, Array():Array[ProgramNode[Int]], Some(1))
+        new ProgramNode(ConstantEvaluationFunction42, Array():Array[ProgramNode[Int]]),
+        new ProgramNode(ConstantEvaluationFunction666, Array():Array[ProgramNode[Int]])
       )
 
-      val testProgram1 = new ProgramNode(HeadEvaluationFunction, commonChildren, None)
-      val testProgram2 = new ProgramNode(LastEvaluationFunction, commonChildren, None)
+      val testProgram1 = new ProgramNode(HeadEvaluationFunction, commonChildren)
+      val testProgram2 = new ProgramNode(LastEvaluationFunction, commonChildren)
 
       val fitnesses = HashMap(testProgram1 -> 126.0, testProgram2 -> 1998.0)
       val uniformReproductionChoiceStrategy = new UniformReproductionChoiceStrategy(fitnesses)

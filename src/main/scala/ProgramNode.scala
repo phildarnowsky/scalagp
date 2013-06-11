@@ -6,16 +6,14 @@ import scala.collection.immutable.Queue
 
 case class ProgramNode[T](
   val evaluationFunction: NodeFunction[T],
-  val children: IndexedSeq[ProgramNode[T]] = Vector[ProgramNode[T]](),
-  val parentIndex: Option[Int] = None
+  val children: IndexedSeq[ProgramNode[T]] = Vector[ProgramNode[T]]()
 ) {
 
  def this(
     evaluationFunction: NodeFunction[T],
-    childrenCreationStrategy: ProgramGenerationStrategy[T],
-    parentIndex: Option[Int]
+    childrenCreationStrategy: ProgramGenerationStrategy[T]
   ) = {
-    this(evaluationFunction, childrenCreationStrategy.generateChildren(evaluationFunction.arity), parentIndex)
+    this(evaluationFunction, childrenCreationStrategy.generateChildren(evaluationFunction.arity))
   }
 
   lazy val evaluate: T = evaluationFunction(children)

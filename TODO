@@ -1,6 +1,9 @@
 MUST HAVE
 
 NICE TO HAVE
+* Checkpointing and restoring populations
+* Hooks for visualizers
+* Overselecting strategy should have more flexible defaults
 * Bias node selection in crossover by terminal/nonterminal status (i.e. node selection is 90% likely to choose an internal node)
 * Elite reproduction
 * Tournament selection
@@ -8,9 +11,7 @@ NICE TO HAVE
 * Mutation
 * De-serialize programs from S-expressions
 * Optimize programs
-* Hooks for visualizers
 * Adapters for Hadoop/EMR
-* Save and load programs
 * Pretty-print program S-expressions
 
 CODE QUALITY

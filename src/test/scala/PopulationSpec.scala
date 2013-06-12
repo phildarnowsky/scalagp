@@ -46,7 +46,7 @@ class PopulationSpec extends Specification with SpecHelpers with Mockito {
       mediocreProgram.crossoverWith(mediocreProgram).returns(List.fill(2)(goodProgram))
 
       val result = Population.run(population)
-      result.bestOfRun._2 must beLessThanOrEqualTo(4010.0)
+      result.bestOfRun.fitness must beLessThanOrEqualTo(4010.0)
       result.generation mustEqual 3
     }
 
@@ -60,7 +60,7 @@ class PopulationSpec extends Specification with SpecHelpers with Mockito {
       mediocreProgram.crossoverWith(mediocreProgram).returns(List.fill(2)(mediocreProgram))
 
       val result = Population.run(population)
-      result.bestOfRun._2 mustEqual 4011.0
+      result.bestOfRun.fitness mustEqual 4011.0
 
       /* Generation 1 improves by default (since there was no previous best)
          Generation 2 improves by breeding mediocreProgram
@@ -155,21 +155,26 @@ class PopulationSpec extends Specification with SpecHelpers with Mockito {
       val population = spy(new Population[Int](List(goodProgram, badProgram), TestProgramFitnessFunction, List(), AlwaysCrossover))
 
       population.bestOfPreviousGenerations mustEqual None
-      population.bestOfRun mustEqual (goodProgram, 1337.0 * 3)
+      population.bestOfRun.program mustEqual goodProgram
+      population.bestOfRun.fitness mustEqual 1337.0 * 3
 
       population.chooseProgramForReproduction.returns(goodProgram).thenReturns(goodProgram)
       goodProgram.crossoverWith(goodProgram).returns(List(badProgram, worseProgram))
 
       val secondGeneration = spy(population.breedNewGeneration)
-      secondGeneration.bestOfPreviousGenerations mustEqual Some((goodProgram, 1337.0 * 3))
-      secondGeneration.bestOfRun mustEqual (goodProgram, 1337.0 * 3)
+      secondGeneration.bestOfPreviousGenerations.map(_.program) mustEqual Some(goodProgram)
+      secondGeneration.bestOfPreviousGenerations.map(_.fitness) mustEqual Some(1337.0 * 3)
+      secondGeneration.bestOfRun.program mustEqual goodProgram
+      secondGeneration.bestOfRun.fitness mustEqual 1337.0 * 3
 
       secondGeneration.chooseProgramForReproduction.returns(badProgram).thenReturns(badProgram)
       badProgram.crossoverWith(badProgram).returns(List(badProgram, bestProgram))
       
       val thirdGeneration = secondGeneration.breedNewGeneration
-      thirdGeneration.bestOfPreviousGenerations mustEqual Some((goodProgram, 1337.0 * 3))
-      thirdGeneration.bestOfRun mustEqual (bestProgram, 42.0 * 3)
+      thirdGeneration.bestOfPreviousGenerations.map(_.program) mustEqual Some(goodProgram)
+      thirdGeneration.bestOfPreviousGenerations.map(_.fitness) mustEqual Some(1337.0 * 3)
+      thirdGeneration.bestOfRun.program mustEqual bestProgram 
+      thirdGeneration.bestOfRun.fitness mustEqual 42.0 * 3
     }
   }
 }

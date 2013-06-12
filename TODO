@@ -15,6 +15,5 @@ NICE TO HAVE
 * Pretty-print program S-expressions
 
 CODE QUALITY
-* Change all those (Program, Fitness) tuples that litter the code into proper objects
 * Attempts to breed an odd number of programs by crossover should be handled gracefully
 * Do the tests rely too heavily on spying?

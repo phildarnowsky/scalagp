@@ -28,7 +28,7 @@ object Population {
   }
 
   def terminateOnFitness(maxFitness: Double): (Population[_] => Boolean) = {
-    ((population: Population[_]) => population.bestOfRun._2 <= maxFitness)
+    ((population: Population[_]) => population.bestOfRun.fitness <= maxFitness)
   }
 
   def terminateOnGeneration(maxGeneration: Int): (Population[_] => Boolean) = {
@@ -76,8 +76,8 @@ object Population {
   def printGenerationStatistics(population: Population[_]): Unit = {
     println("*******************")
     println("GENERATION " ++ population.generation.toString)
-    println("BEST FITNESS OF CURRENT GENERATION: " ++ population.bestOfCurrentGeneration._2.toString)
-    println("BEST FITNESS OF RUN: " ++ population.bestOfRun._2.toString)
+    println("BEST FITNESS OF CURRENT GENERATION: " ++ population.bestOfCurrentGeneration.fitness.toString)
+    println("BEST FITNESS OF RUN: " ++ population.bestOfRun.fitness.toString)
 
     //val nodeTotal = population.programs.map(_.allDescendants.length).sum
     //println("TOTAL NODES: " ++ nodeTotal.toString)
@@ -91,13 +91,16 @@ case class ReproductionParameters(
   val reproductionProportion: Double = 0.1
 )
 
+class ProgramFitness[ProgramType](val program: ProgramNode[ProgramType], val fitness: Double) {
+}
+
 case class PopulationHistory[ProgramType](
   val generation: Int = 1,
-  val bestOfPreviousGenerations: Option[(ProgramNode[ProgramType], Double)] = None,
+  val bestOfPreviousGenerations: Option[(ProgramFitness[ProgramType])] = None,
   val previousGenerationsWithoutImprovement: Int = 0
 ) {
 
-  def updateForNewGeneration(bestOfRun: (ProgramNode[ProgramType], Double), generationsWithoutImprovement: Int) = {
+  def updateForNewGeneration(bestOfRun: ProgramFitness[ProgramType], generationsWithoutImprovement: Int) = {
     this.copy(
       bestOfPreviousGenerations =             Some(bestOfRun),
       previousGenerationsWithoutImprovement = generationsWithoutImprovement,
@@ -120,21 +123,24 @@ case class Population[ProgramType](
     programs.foldLeft(knownFitnesses)((map, program) => map + (program -> fitnessFunction(program.evaluate)))
   }
 
-  lazy val bestOfCurrentGeneration = fitnesses.toList.sortBy(_._2).head
+  lazy val bestOfCurrentGeneration = {
+    val (a, b) = fitnesses.toList.sortBy(_._2).head
+    new ProgramFitness(a,b)
+  }
 
   // is there a more idiomatic way to write this?
   lazy val bestOfRun = bestOfPreviousGenerations match {
                          case None => bestOfCurrentGeneration
-                         case Some(oldBest) => List(oldBest, bestOfCurrentGeneration).sortBy(_._2).head
+                         case Some(oldBest) => List(oldBest, bestOfCurrentGeneration).sortBy(_.fitness).head
                        }
 
   lazy val reproductionChoiceStrategy = reproductionChoiceStrategyGenerator(fitnesses)
 
   def breedNewGeneration: Population[ProgramType] = {
     val programsFromCrossover = breedByCrossover
-    val programsAndFitnessesFromReproduction = breedByReproduction
-    val programsFromReproduction = programsAndFitnessesFromReproduction.map(_._1)
-    val newKnownFitnesses = programsAndFitnessesFromReproduction.toMap
+    val programFitnessesFromReproduction = breedByReproduction
+    val programsFromReproduction = programFitnessesFromReproduction.map(_.program)
+    val newKnownFitnesses = programFitnessesFromReproduction.foldLeft(Map.empty[ProgramNode[ProgramType], Double]) ((map, programFitness) => map + (programFitness.program -> programFitness.fitness))
 
     this.copy(
       programs = (programsFromCrossover ++ programsFromReproduction),
@@ -153,7 +159,7 @@ case class Population[ProgramType](
   def didBestOfRunImprove(): Boolean = {
     bestOfPreviousGenerations match {
       case None => true
-      case Some(oldbest) => (bestOfCurrentGeneration._2 < oldbest._2)
+      case Some(oldbest) => (bestOfCurrentGeneration.fitness < oldbest.fitness)
     }
   }
 
@@ -165,11 +171,11 @@ case class Population[ProgramType](
     breedingPairs.flatMap((pair) => pair(0).crossoverWith(pair(1), depthLimit)).toList
   }
 
-  def breedByReproduction(): Seq[(ProgramNode[ProgramType], Double)] = {
+  def breedByReproduction(): Seq[ProgramFitness[ProgramType]] = {
     val reproductionCount = (programs.length * reproductionProportion).toInt
     List.fill(reproductionCount){
       val chosenProgram = chooseProgramForReproduction
-      (chosenProgram, fitnesses(chosenProgram))
+      new ProgramFitness(chosenProgram, fitnesses(chosenProgram))
     }
   }
 

@@ -109,6 +109,24 @@ case class PopulationHistory[ProgramType](
   }
 }
 
+/** A collection of all programs in a given generation.
+
+    A `Population[T]` brings together programs of type `T` with a 
+    [[com.darnowsky.scalagp.Population.ProgramFitnessFunction]][T]
+    and uses the fitness function to evaluate each of the programs, with a
+    lower fitness value corresponding to a more fit program.
+
+    One of a `Population`'s main duties is to breed the next generation's
+    `Population`, in such a way that fitter programs are likely to reproduce
+    more often than less fit programs, and hence pass their adaptive traits to
+    the next generation. Our hope is that the selection pressure that the
+    fitness function imposes on our programs will, over the course of many
+    generations, cause fitness to rise until we get a sufficiently fit program
+    (or we hit another termination condition such as an upper limit on total
+    generations).
+
+*/
+
 case class Population[ProgramType](
   val programs: Seq[ProgramNode[ProgramType]], 
   val fitnessFunction: ProgramFitnessFunction[ProgramType],
@@ -136,6 +154,8 @@ case class Population[ProgramType](
 
   lazy val reproductionChoiceStrategy = reproductionChoiceStrategyGenerator(fitnesses)
 
+  /** Returns a new Population representing a new generation of programs bred
+      from the generation of programs in the Population we call this on. */
   def breedNewGeneration: Population[ProgramType] = {
     val programsFromCrossover = breedByCrossover
     val programFitnessesFromReproduction = breedByReproduction
@@ -149,6 +169,8 @@ case class Population[ProgramType](
     )
   }
 
+  /** How many generations have we gone without finding a new fittest program.
+  */
   def generationsWithoutImprovement: Int = {
     if(didBestOfRunImprove)
       0 

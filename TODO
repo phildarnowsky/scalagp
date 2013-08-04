@@ -1,19 +1,21 @@
 MUST HAVE
+* API dox
 
 NICE TO HAVE
 * Checkpointing and restoring populations
 * Hooks for visualizers
 * Overselecting strategy should have more flexible defaults
 * Bias node selection in crossover by terminal/nonterminal status (i.e. node selection is 90% likely to choose an internal node)
+* Tournament selection & coevolution
 * Elite reproduction
-* Tournament selection
 * Rank selection
 * Mutation
 * De-serialize programs from S-expressions
 * Optimize programs
 * Adapters for Hadoop/EMR
-* Pretty-print program S-expressions
 
 CODE QUALITY
+* Protected doesn't do what I expected--it's on a method-by-method basis apparently
 * Attempts to breed an odd number of programs by crossover should be handled gracefully
 * Do the tests rely too heavily on spying?
+* Population is in danger of becoming a God Object, if it isn't already.

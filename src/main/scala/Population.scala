@@ -206,7 +206,6 @@ case class Population[ProgramType](
   // Default toString is so verbose that it can easily provoke an OOME
   override def toString = "Population " + hashCode.toString + " " + "(generation " + generation.toString + ")"
 
-  protected
 
   // Delegate these values to reproductionParameters
   def depthLimit             = reproductionParameters.depthLimit

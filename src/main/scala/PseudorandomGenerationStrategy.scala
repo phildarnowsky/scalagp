@@ -22,7 +22,5 @@ extends ProgramGenerationStrategy[T](nonterminals, terminals, depth) {
   def functionsAllowedAtTerminalDepth(): Seq[NodeFunctionCreator[T]]
   def functionsAllowedAtNonterminalDepth(): Seq[NodeFunctionCreator[T]]
 
-  protected
-
-  def chooseArbitraryNodeFunction(candidates: Seq[NodeFunctionCreator[T]]): NodeFunctionCreator[T] = candidates(rng.nextInt(candidates.length))
+  protected def chooseArbitraryNodeFunction(candidates: Seq[NodeFunctionCreator[T]]): NodeFunctionCreator[T] = candidates(rng.nextInt(candidates.length))
 }

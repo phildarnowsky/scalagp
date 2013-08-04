@@ -2,6 +2,7 @@ MUST HAVE
 * API dox
 
 NICE TO HAVE
+* Coevolution
 * Checkpointing and restoring populations
 * Hooks for visualizers
 * Overselecting strategy should have more flexible defaults
@@ -12,10 +13,9 @@ NICE TO HAVE
 * Mutation
 * De-serialize programs from S-expressions
 * Optimize programs
-* Adapters for Hadoop/EMR
+* Adapters for exploiting parallelism (e.g. via Map/Reduce)
 
 CODE QUALITY
-* Protected doesn't do what I expected--it's on a method-by-method basis apparently
 * Attempts to breed an odd number of programs by crossover should be handled gracefully
 * Do the tests rely too heavily on spying?
 * Population is in danger of becoming a God Object, if it isn't already.

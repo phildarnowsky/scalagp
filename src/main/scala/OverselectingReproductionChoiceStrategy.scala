@@ -25,18 +25,16 @@ class OverselectingReproductionChoiceStrategy[ProgramType](fitnesses: Map[Progra
 
   lazy val generalPrograms = new UniformReproductionChoiceStrategy(generalFitnesses)
 
-  protected
+  def chooseSubpopulationIndex = rng.nextDouble()
 
-  val eliteCount = {
+  protected val eliteCount = {
     val rawEliteCount = (fitnesses.size * eliteProportion).floor.toInt
     1.max(rawEliteCount).min(fitnesses.size - 1) // at least 1 in both elite and general populations
   }
 
-  val sortedFitnesses = fitnesses.toList.sortBy(_._2)
-  val dividedFitnesses = sortedFitnesses.splitAt(eliteCount)
+  protected val sortedFitnesses = fitnesses.toList.sortBy(_._2)
+  protected val dividedFitnesses = sortedFitnesses.splitAt(eliteCount)
 
-  val eliteFitnesses = dividedFitnesses._1.toMap[ProgramNode[ProgramType], Double]
-  val generalFitnesses = dividedFitnesses._2.toMap[ProgramNode[ProgramType], Double]
-
-  def chooseSubpopulationIndex = rng.nextDouble()
+  protected val eliteFitnesses = dividedFitnesses._1.toMap[ProgramNode[ProgramType], Double]
+  protected val generalFitnesses = dividedFitnesses._2.toMap[ProgramNode[ProgramType], Double]
 }

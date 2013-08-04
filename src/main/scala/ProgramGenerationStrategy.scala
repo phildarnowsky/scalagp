@@ -47,10 +47,8 @@ abstract case class ProgramGenerationStrategy[T] (
   // depth = depth - 1. I sort of hate that.
   def successor(): ProgramGenerationStrategy[T]
 
-  protected
+  protected def chooseTerminalFunction(): NodeFunctionCreator[T]
+  protected def chooseNonterminalFunction(): NodeFunctionCreator[T]
 
-  def chooseTerminalFunction(): NodeFunctionCreator[T]
-  def chooseNonterminalFunction(): NodeFunctionCreator[T]
-
-  def nextLevelTerminal(): Boolean = (depth - 1 == 1)
+  protected def nextLevelTerminal(): Boolean = (depth - 1 == 1)
 }

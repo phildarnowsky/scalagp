@@ -118,16 +118,14 @@ case class ProgramNode[T](
                         else
                           1 + children.map(_.depth).max
 
-  protected
-
-  def allDescendantsAcc(queueToHere: Queue[Int]): IndexedSeq[(ProgramNode[T], Queue[Int])] = {
+  protected def allDescendantsAcc(queueToHere: Queue[Int]): IndexedSeq[(ProgramNode[T], Queue[Int])] = {
     children.zipWithIndex.flatMap((childTuple) => childTuple._1.allDescendantsAcc(queueToHere :+ childTuple._2)) :+
                                  (this, queueToHere)
                          
   }
 
 
-  def insertReplacementSubtree(that: ProgramNode[T], position: Queue[Int]): ProgramNode[T] = {
+  protected def insertReplacementSubtree(that: ProgramNode[T], position: Queue[Int]): ProgramNode[T] = {
     val newSubtree = that
     if(position.isEmpty) {
       newSubtree
@@ -143,5 +141,5 @@ case class ProgramNode[T](
     }
   }
 
-  def followPath(path: Queue[Int]): ProgramNode[T] = path.foldLeft(this)((program, index) => program.children(index))
+  protected def followPath(path: Queue[Int]): ProgramNode[T] = path.foldLeft(this)((program, index) => program.children(index))
 }

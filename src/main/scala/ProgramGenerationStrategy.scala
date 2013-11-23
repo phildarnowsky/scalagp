@@ -17,12 +17,11 @@ abstract case class ProgramGenerationStrategy[T] (
   def generateChildren(arity: Int): IndexedSeq[ProgramNode[T]] = {
     val childFunctions = this.generateChildFunctions(arity)
 
-    childFunctions.toIndexedSeq.zipWithIndex.map{
-      (functionTuple) => new ProgramNode[T](
-        functionTuple._1, 
+    childFunctions.toIndexedSeq.map{
+      (childFunction: NodeFunction[T]) => new ProgramNode[T](
+        childFunction, 
         this.successor
       )
-        //pathFromRoot.enqueue(functionTuple._2))
     }
   }
 

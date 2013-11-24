@@ -1,7 +1,8 @@
 MUST HAVE
-* API dox
 
 NICE TO HAVE
+* Multiple result-producing branches in program trees
+* Multiple types, with crossover restricted to nodes of like type
 * Coevolution
 * Checkpointing and restoring populations
 * Hooks for visualizers

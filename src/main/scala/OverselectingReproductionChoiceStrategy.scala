@@ -10,6 +10,17 @@ object OverselectingReproductionChoiceStrategy extends ReproductionChoiceStrateg
   def apply[ProgramType](fitnesses: Map[ProgramNode[ProgramType], Double]): OverselectingReproductionChoiceStrategy[ProgramType] = new OverselectingReproductionChoiceStrategy(fitnesses)
 }
 
+/** A type of `ReproductionChoiceStrategy` that separates programs, based on 
+    their fitness values, into an elite subpopulation and a general 
+    subpopulation, and where `chooseProgramForReproduction` is more likely to
+    return a program from the elite group. 
+   
+    `eliteProportion` and `eliteLikelihood` should both be strictly between 
+    0.0 and 1.0, representing the proportion of programs that will be put in
+    the elite group, and the likelihood that a program will be chosen from
+    the elite group (as opposed to the general group) on a particular call to
+    `chooseProgramForReproduction`.  */
+
 class OverselectingReproductionChoiceStrategy[ProgramType](fitnesses: Map[ProgramNode[ProgramType], Double], eliteProportion: Double = 0.32, eliteLikelihood: Double = 0.8) extends ReproductionChoiceStrategy[ProgramType](fitnesses) { 
   val rng = new scala.util.Random
 

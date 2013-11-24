@@ -9,6 +9,11 @@ object UniformReproductionChoiceStrategy extends ReproductionChoiceStrategyGener
   def apply[ProgramType](fitnesses: Map[ProgramNode[ProgramType], Double]): UniformReproductionChoiceStrategy[ProgramType] = new UniformReproductionChoiceStrategy(fitnesses)
 }
 
+/** A type of `ReproductionChoiceStrategy` where, every time a program is
+    requested for reproduction via `chooseProgramForReproduction`, has a
+    chance of returning any given program inversely proportional to that
+    program's fitness value--remember, smaller fitness value is better, with
+    0 indicating a perfect solution, if it's possible for one to exist. */
 class UniformReproductionChoiceStrategy[ProgramType](fitnesses: Map[ProgramNode[ProgramType], Double]) extends ReproductionChoiceStrategy[ProgramType](fitnesses) {
   val rng = new scala.util.Random
 

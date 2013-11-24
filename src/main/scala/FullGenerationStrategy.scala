@@ -3,6 +3,9 @@ package com.darnowsky.scalagp.FullGenerationStrategy
 import com.darnowsky.scalagp.PsuedorandomGenerationStrategy._
 import com.darnowsky.scalagp.NodeFunction._
 
+/** A kind of `ProgramGenerationStrategy` that always generates program trees
+    of exactly the given `depth`. */
+
 class FullGenerationStrategy[T](
   nonterminals: Seq[NonterminalNodeFunctionCreator[T]], 
   terminals: Seq[TerminalNodeFunctionCreator[T]],

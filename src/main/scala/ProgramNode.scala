@@ -12,6 +12,10 @@ import scala.collection.immutable.Queue
     of child `ProgramNode`s. When evaluated, this `ProgramNode` returns the 
     result of applying the one to the other.
 
+    A `ProgramNode` also has a (possibly empty) collection of `children`, and
+    we thereby build trees of `ProgramNode`s. These trees are the abstract
+    syntax trees of the programs we are evolving.
+
     `ProgramNode`s can also cross themselves over with other `ProgramNode`s of
     the same type, which is a major way that we hope to breed fitter programs 
     as the generations march on.
